@@ -69,7 +69,7 @@ export function VaultPage() {
     }
     const now = Date.now();
     if (editingEntry) {
-      await vault.updateEntry(editingEntry.id, { ...form, updatedAt: now });
+      await vault.updateEntry(editingEntry.id, { ...form });
       toast(t('vault.entry_updated'));
     } else {
       const entry: VaultEntry = {
@@ -284,7 +284,7 @@ function UnlockForm() {
     setLoading(true);
     const ok = await vault.unlock(pwd);
     setLoading(false);
-    if (ok) toast(t('vault.entry_added'));
+    if (ok) toast('🔓 ' + t('vault.unlock_title'));
     else toast(t('errors.mp_wrong'), 'error');
   };
 

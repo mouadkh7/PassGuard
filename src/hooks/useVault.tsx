@@ -55,19 +55,19 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   const getKey = useCallback(() => keyRef.current, []);
   const getMp = useCallback(() => mpRef.current, []);
 
-  const persistEntries = useCallback(async () => {
+  const persistEntries = useCallback(async (entries: VaultEntry[]) => {
     if (!keyRef.current || !vaultRef.current) return;
-    const entriesStr = JSON.stringify(state.entries);
+    const entriesStr = JSON.stringify(entries);
     vaultRef.current.entries = await encrypt(entriesStr, keyRef.current);
     vaultRef.current.updated = Date.now();
     ST.saveVault(vaultRef.current);
 
-    const sc = computeHealthScore(state.entries);
+    const sc = computeHealthScore(entries);
     const hist = ST.loadHealthHistory();
-    hist.push({ date: Date.now(), score: sc, count: state.entries.length });
+    hist.push({ date: Date.now(), score: sc, count: entries.length });
     if (hist.length > 30) hist.splice(0, hist.length - 30);
     ST.saveHealthHistory(hist);
-  }, [state.entries]);
+  }, []);
 
   const unlock = useCallback(async (password: string): Promise<boolean> => {
     let vault = ST.loadVault();
@@ -99,38 +99,35 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const saveAll = useCallback(async () => {
-    await persistEntries();
-  }, [persistEntries]);
+    setState(prev => {
+      persistEntries(prev.entries);
+      return prev;
+    });
+  }, []);
 
   const addEntry = useCallback(async (entry: VaultEntry) => {
     setState(prev => {
       const entries = [...prev.entries, entry];
-      setTimeout(() => persistEntries(), 0);
+      persistEntries(entries);
       return { ...prev, entries };
     });
-  }, [persistEntries]);
+  }, []);
 
   const updateEntry = useCallback(async (id: string, data: Partial<VaultEntry>) => {
     setState(prev => {
       const entries = prev.entries.map(e => e.id === id ? { ...e, ...data, updatedAt: Date.now() } as VaultEntry : e);
-      setTimeout(() => {
-        setState(p => ({ ...p, entries }));
-        persistEntries();
-      }, 0);
-      return prev;
+      persistEntries(entries);
+      return { ...prev, entries };
     });
-  }, [persistEntries]);
+  }, []);
 
   const deleteEntry = useCallback(async (id: string) => {
     setState(prev => {
       const entries = prev.entries.filter(e => e.id !== id);
-      setTimeout(() => {
-        setState(p => ({ ...p, entries }));
-        persistEntries();
-      }, 0);
-      return prev;
+      persistEntries(entries);
+      return { ...prev, entries };
     });
-  }, [persistEntries]);
+  }, []);
 
   const setPin = useCallback(async (pin: string): Promise<boolean> => {
     if (!mpRef.current) return false;

@@ -52,7 +52,7 @@
 
 ### Option 3: Self-Host
 ```bash
-git clone https://github.com/YOUR_USERNAME/passguard.git
+git clone https://github.com/mouadkh7/PassGuard.git
 cd passguard
 # Serve with any HTTP server:
 python3 -m http.server 8080

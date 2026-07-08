@@ -3,6 +3,7 @@
   "short_name": "PassGuard",
   "description": "مدير كلمات مرور مفتوح المصدر، مشفر بالكامل محلياً",
   "start_url": "passguard.html",
+  "scope": ".",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0f172a",

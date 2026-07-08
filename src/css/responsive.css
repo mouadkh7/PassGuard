@@ -1,0 +1,47 @@
+/* ===============================================
+   PassGuard v6.0 - Responsive Styles
+   =============================================== */
+
+@media (max-width: 767px) {
+  .main-nav { display: none; }
+  .mobile-nav { display: flex; }
+  .main-content { padding-bottom: 80px; }
+  .card { padding: 16px; }
+  .card h2 { font-size: 17px; }
+  .card-sub { font-size: 12px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-value { font-size: 24px; }
+  .control-grid { grid-template-columns: 1fr; }
+  .control-grid-4 { grid-template-columns: 1fr 1fr; }
+  .output-display { font-size: 15px; }
+  .filter-bar { flex-wrap: wrap; }
+  .filter-bar .search-input { min-width: 100%; }
+  .header-inner { padding: 8px 12px; }
+  .brand-title { font-size: 14px; }
+  .unlock-container { margin: 20px auto; }
+  .settings-card { padding: 12px; }
+  .toast-container { left: 8px; right: 8px; max-width: none; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .col-span-2 { grid-column: span 1; }
+  .entry-title { max-width: 140px; font-size: 13px; }
+  .modal { padding: 16px; max-height: 85vh; }
+  .totp-code { font-size: 28px; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat-value { font-size: 20px; }
+  .stat-card { padding: 12px; }
+  .entry-card { padding: 10px 12px; }
+  .brand-icon { width: 32px; height: 32px; }
+  .brand-icon svg { width: 16px; height: 16px; }
+}
+
+@media (min-width: 768px) {
+  .mobile-nav { display: none !important; }
+  .toast-container { left: 24px; }
+}
+
+@media (min-width: 1024px) {
+  .card { padding: 28px; }
+}

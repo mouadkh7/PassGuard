@@ -1,19 +1,429 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="refresh" content="0;url=passguard.html">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>PassGuard</title>
-<link rel="manifest" href="manifest.json">
-<script>navigator.serviceWorker?.register('sw.js')</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+  <meta name="theme-color" id="metaTheme" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="PassGuard - مدير كلمات مرور مشفر بالكامل، مفتوح المصدر، يعمل محلياً">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><text x='50' y='70' font-size='55' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>P</text></svg>">
+  <title>PassGuard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cairo@4.5.10/index.min.css">
+  <link rel="stylesheet" href="src/css/main.css">
+  <link rel="stylesheet" href="src/css/components.css">
+  <link rel="stylesheet" href="src/css/responsive.css">
 </head>
-<body style="background:#0f172a;color:#94a3b8;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;text-align:center">
-  <div>
-    <p style="font-size:48px;margin-bottom:8px">🔐</p>
-    <p style="font-size:18px;font-weight:bold;color:#f1f5f9">جاري تحميل PassGuard...</p>
-    <p style="font-size:13px;margin-top:4px">Loading PassGuard...</p>
-    <a href="passguard.html" style="display:inline-block;margin-top:16px;padding:10px 24px;background:#6366f1;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">فتح PassGuard</a>
+<body>
+
+<div id="toast" class="toast-container" role="status" aria-live="polite"></div>
+
+<header class="app-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      </div>
+      <div>
+        <h1 class="brand-title">PassGuard</h1>
+        <p class="brand-sub">مفتوح المصدر • مشفر محلياً</p>
+      </div>
+    </div>
+    <nav class="main-nav" aria-label="التنقل الرئيسي">
+      <button data-tab="generator" class="tab-btn tab-active">🎲 المولد</button>
+      <button data-tab="vault" class="tab-btn">🔐 الخزنة</button>
+      <button data-tab="dashboard" class="tab-btn">📊 لوحة التحكم</button>
+      <button data-tab="settings" class="tab-btn">⚙️ الإعدادات</button>
+    </nav>
+    <button id="themeToggle" class="icon-btn" aria-label="تبديل السمة">🌙</button>
   </div>
+</header>
+
+<main class="main-content">
+
+  <!-- ===== GENERATOR ===== -->
+  <section id="tab-generator" class="tab-content active">
+    <div class="card">
+      <h2>مولد كلمات المرور</h2>
+      <p class="card-sub">أنشئ كلمات مرور وعبارات مرور قوية</p>
+
+      <div class="mode-tabs">
+        <button id="genModePwd" class="mode-btn active">🔑 كلمة مرور</button>
+        <button id="genModePhrase" class="mode-btn">🔤 عبارة مرور</button>
+        <button id="genModePin" class="mode-btn">🔢 PIN</button>
+      </div>
+
+      <!-- Password mode -->
+      <div id="genPwdPanel" class="gen-panel">
+        <div class="output-box">
+          <div id="genDisplay" class="output-display">اضغط "توليد"</div>
+          <div class="output-meta">
+            <div class="strength-info">
+              <span class="meta-label">القوة:</span>
+              <div class="strength-bar"><div id="strBar" class="strength-fill"></div></div>
+              <span id="strText" class="strength-label">-</span>
+            </div>
+            <div class="entropy-info">الإنتروبيا: <span id="entropyVal">0</span> بت</div>
+          </div>
+        </div>
+        <div class="control-grid">
+          <div class="control-item">
+            <label>الطول</label>
+            <input type="range" id="pwdLen" min="4" max="100" value="24">
+            <span id="pwdLenVal" class="control-value">24</span>
+          </div>
+          <div class="checkbox-grid">
+            <label class="check-pill"><input type="checkbox" id="pu" checked><span>A‑Z</span></label>
+            <label class="check-pill"><input type="checkbox" id="pl" checked><span>a‑z</span></label>
+            <label class="check-pill"><input type="checkbox" id="pn" checked><span>0‑9</span></label>
+            <label class="check-pill"><input type="checkbox" id="ps" checked><span>!@#$%</span></label>
+          </div>
+        </div>
+        <label class="check-pill check-pill-wide">
+          <input type="checkbox" id="pavoid">
+          <span>تجنب المتشابهة (l,1,I,O,0)</span>
+        </label>
+      </div>
+
+      <!-- Phrase mode -->
+      <div id="genPhrasePanel" class="gen-panel hidden">
+        <div class="output-box">
+          <div id="phraseDisplay" class="output-display">اضغط "توليد"</div>
+          <div class="strength-info">
+            <span class="meta-label">القوة:</span>
+            <div class="strength-bar"><div id="phraseStrBar" class="strength-fill"></div></div>
+            <span id="phraseStrText" class="strength-label">-</span>
+          </div>
+        </div>
+        <div class="control-grid-4">
+          <div class="control-item">
+            <label>عدد الكلمات</label>
+            <input type="range" id="phraseWords" min="2" max="12" value="4">
+            <span id="phraseWordsVal" class="control-value">4</span>
+          </div>
+          <div class="control-item">
+            <label>الفاصل</label>
+            <select id="phraseSep" class="select-control">
+              <option value="-">-</option>
+              <option value=" ">مسافة</option>
+              <option value="_">_</option>
+              <option value=".">.</option>
+              <option value=",">,</option>
+            </select>
+          </div>
+          <label class="check-pill"><input type="checkbox" id="phraseCap"><span>تكبير أول حرف</span></label>
+          <label class="check-pill"><input type="checkbox" id="phraseNum"><span>إضافة رقم</span></label>
+        </div>
+      </div>
+
+      <!-- PIN mode -->
+      <div id="genPinPanel" class="gen-panel hidden">
+        <div class="output-box">
+          <div id="pinDisplay" class="output-display">اضغط "توليد"</div>
+        </div>
+        <div class="control-item">
+          <label>عدد الأرقام</label>
+          <input type="range" id="pinLen" min="4" max="12" value="6">
+          <span id="pinLenVal" class="control-value">6</span>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button id="btnGen" class="btn-primary">🎲 توليد</button>
+        <button id="btnCopy" class="btn-ghost" disabled>📋 نسخ</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VAULT ===== -->
+  <section id="tab-vault" class="tab-content">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2>خزنة كلمات المرور</h2>
+          <p class="card-sub">مستودع مشفر بالكامل • <span id="entryCount">0</span> إدخال</p>
+        </div>
+        <div id="vaultActions" class="action-group hidden">
+          <button id="btnImportVault" class="btn-ghost btn-icon" title="استيراد">📥</button>
+          <button id="btnExportVault" class="btn-ghost btn-icon" title="تصدير">📤</button>
+          <button id="btnAdd" class="btn-primary">➕ إضافة</button>
+          <button id="btnLock" class="btn-danger btn-icon" title="قفل">🔒</button>
+        </div>
+      </div>
+
+      <!-- Unlock form -->
+      <div id="unlockForm">
+        <div class="unlock-container">
+          <div class="unlock-card">
+            <div class="unlock-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </div>
+            <h3 id="unlockTitle">افتح الخزنة</h3>
+            <p id="unlockDesc" class="card-sub">أدخل كلمة المرور الرئيسية</p>
+            <div class="input-with-action">
+              <input id="mp" type="password" placeholder="كلمة المرور الرئيسية" autocomplete="off">
+              <button id="toggleMp" type="button" class="input-action">👁️</button>
+            </div>
+            <button id="btnUnlock" class="btn-primary btn-full">🔓 فتح</button>
+            <p id="firstTimeMsg" class="info-text hidden">🆕 سيتم إنشاء خزنة جديدة بكلمة المرور هذه</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vault content -->
+      <div id="vaultContent" class="hidden">
+        <div class="filter-bar">
+          <input id="vSearch" type="text" placeholder="🔍 بحث..." class="search-input">
+          <select id="vFilter" class="select-control">
+            <option value="all">الكل</option>
+            <option value="password">🔑 كلمات مرور</option>
+            <option value="note">📝 ملاحظات</option>
+            <option value="identity">🪪 هوية</option>
+            <option value="payment">💳 بطاقات</option>
+          </select>
+          <select id="vSort" class="select-control">
+            <option value="date-desc">🕒 الأحدث</option>
+            <option value="date-asc">🕒 الأقدم</option>
+            <option value="title-asc">🔤 أ-ي</option>
+            <option value="title-desc">🔤 ي-أ</option>
+          </select>
+          <select id="vFolder" class="select-control">
+            <option value="__all">📁 الكل</option>
+            <option value="__favorites">⭐ المفضلة</option>
+          </select>
+        </div>
+        <div id="statsRow" class="stats-row"></div>
+        <div id="emptyVault" class="empty-state hidden">
+          <div class="empty-icon">🔐</div>
+          <p>لا توجد إدخالات بعد</p>
+        </div>
+        <div id="noResults" class="empty-state hidden">
+          <div class="empty-icon">🔍</div>
+          <p>لا توجد نتائج</p>
+        </div>
+        <div id="entriesList" class="entries-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DASHBOARD ===== -->
+  <section id="tab-dashboard" class="tab-content">
+    <div class="card">
+      <h2>لوحة التحكم الأمنية</h2>
+      <p class="card-sub">تحليل شامل لأمان خزنتك</p>
+      <div id="dashLocked" class="unlock-container">
+        <div class="unlock-card">
+          <div class="unlock-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h3>الخزنة مقفلة</h3>
+          <p class="card-sub">افتح الخزنة لتحليل الأمان</p>
+          <button id="dashGoVault" class="btn-primary">🗄️ فتح الخزنة</button>
+        </div>
+      </div>
+      <div id="dashContent" class="dash-content hidden"></div>
+    </div>
+  </section>
+
+  <!-- ===== SETTINGS ===== -->
+  <section id="tab-settings" class="tab-content">
+    <div class="card">
+      <h2>الإعدادات</h2>
+      <p class="card-sub">تخصيص التطبيق</p>
+
+      <div class="settings-group">
+        <div class="settings-card">
+          <h3>🔒 الأمان</h3>
+          <div class="settings-row">
+            <span>القفل التلقائي</span>
+            <select id="setAutoLock" class="select-control">
+              <option value="0">أبداً</option>
+              <option value="1">1 دقيقة</option>
+              <option value="5" selected>5 دقائق</option>
+              <option value="15">15 دقيقة</option>
+              <option value="30">30 دقيقة</option>
+            </select>
+          </div>
+          <div class="settings-row">
+            <span>فتح سريع بـ PIN</span>
+            <label class="toggle">
+              <input type="checkbox" id="setPinEnable">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div id="pinSection" class="hidden">
+            <input type="password" id="setPinInput" placeholder="PIN (4-8 أرقام)" maxlength="8" class="pin-input">
+            <p class="info-text">سيتم حفظ PIN مشفر محلياً</p>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>🎨 المظهر</h3>
+          <select id="setTheme" class="select-control">
+            <option value="dark">🌙 داكن</option>
+            <option value="light">☀️ فاتح</option>
+            <option value="system">💻 تلقائي</option>
+          </select>
+        </div>
+
+        <div class="settings-card">
+          <h3>📦 البيانات</h3>
+          <div class="button-group">
+            <button id="setExportJson" class="btn-ghost">📤 تصدير JSON</button>
+            <button id="setExportCsv" class="btn-ghost">📤 تصدير CSV</button>
+            <button id="setImport" class="btn-ghost">📥 استيراد</button>
+            <button id="setClear" class="btn-danger">🗑️ مسح الخزنة</button>
+          </div>
+          <p class="info-text">يدعم الاستيراد: JSON (PassGuard), CSV (Bitwarden, LastPass)</p>
+        </div>
+
+        <div class="settings-card">
+          <h3>ℹ️ حول PassGuard</h3>
+          <p class="info-text">الإصدار 6.0 • مفتوح المصدر بالكامل • تشفير AES-256-GCM + PBKDF2 • جميع البيانات محلية</p>
+          <p class="info-text">تم إنشاؤه بـ ❤️ باستخدام Web Crypto API</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav id="mobileNav" class="mobile-nav" aria-label="التنقل السفلي">
+  <button data-tab="generator" class="mobile-nav-btn active"><i>🎲</i><span>المولد</span></button>
+  <button data-tab="vault" class="mobile-nav-btn"><i>🔐</i><span>الخزنة</span></button>
+  <button data-tab="dashboard" class="mobile-nav-btn"><i>📊</i><span>اللوحة</span></button>
+  <button data-tab="settings" class="mobile-nav-btn"><i>⚙️</i><span>الإعدادات</span></button>
+</nav>
+
+<!-- Entry Modal -->
+<div id="entryModal" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">إضافة إدخال</h3>
+      <button id="modalClose" class="modal-close" aria-label="إغلاق">✕</button>
+    </div>
+
+    <div class="type-tabs">
+      <button data-etype="password" class="type-btn active">🔑 كلمة مرور</button>
+      <button data-etype="note" class="type-btn">📝 ملاحظة</button>
+      <button data-etype="identity" class="type-btn">🪪 هوية</button>
+      <button data-etype="payment" class="type-btn">💳 بطاقة</button>
+    </div>
+
+    <div class="modal-body">
+      <input id="mTitle" type="text" placeholder="العنوان">
+
+      <div id="mPwdFields">
+        <input id="mUrl" type="url" placeholder="الرابط (URL)" class="ltr-input">
+        <input id="mUsername" type="text" placeholder="اسم المستخدم / البريد">
+        <div class="input-with-action">
+          <input id="mPassword" type="password" placeholder="كلمة المرور" class="ltr-input">
+          <button id="toggleMpwd" type="button" class="input-action">👁️</button>
+          <select id="mPwdGen" class="select-control select-narrow" title="توليد كلمة مرور">
+            <option value="">🎲</option>
+            <option value="pwd-16">🔑 16</option>
+            <option value="pwd-24">🔑 24</option>
+            <option value="pwd-32">🔑 32</option>
+            <option value="phrase-4">🔤 4</option>
+            <option value="phrase-6">🔤 6</option>
+            <option value="pin-6">🔢 6</option>
+            <option value="pin-8">🔢 8</option>
+          </select>
+        </div>
+        <div class="input-with-action">
+          <input id="mTotp" type="text" placeholder="TOTP Secret (base32)" class="ltr-input mono-input">
+          <button id="btnTotpTest" class="input-action" title="اختبار TOTP">🔑</button>
+        </div>
+      </div>
+
+      <div id="mIdFields" class="hidden grid-2">
+        <input id="mFullName" type="text" placeholder="الاسم الكامل">
+        <input id="mEmail" type="email" placeholder="البريد الإلكتروني">
+        <input id="mPhone" type="tel" placeholder="رقم الهاتف">
+        <input id="mAddress" type="text" placeholder="العنوان">
+        <input id="mIdNumber" type="text" placeholder="رقم الهوية" class="col-span-2">
+      </div>
+
+      <div id="mPayFields" class="hidden grid-2">
+        <input id="mCardName" type="text" placeholder="الاسم على البطاقة" class="col-span-2">
+        <input id="mCardNum" type="text" placeholder="رقم البطاقة" class="ltr-input col-span-2">
+        <input id="mCardExp" type="text" placeholder="MM/YY" class="ltr-input">
+        <input id="mCardCvv" type="text" placeholder="CVV" class="ltr-input">
+        <input id="mCardPin" type="text" placeholder="PIN" class="ltr-input col-span-2">
+      </div>
+
+      <textarea id="mNotes" rows="2" placeholder="ملاحظات..." class="textarea-control"></textarea>
+      <input id="mTags" type="text" placeholder="وسوم (مفصولة بفواصل)">
+      <div class="row-flex">
+        <input id="mExpiry" type="date" class="date-input">
+        <label class="check-pill">
+          <input type="checkbox" id="mFavorite">
+          <span>⭐ مفضلة</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button id="modalCancel" class="btn-ghost">إلغاء</button>
+      <button id="modalSave" class="btn-primary">💾 حفظ</button>
+    </div>
+    <input id="editId" type="hidden">
+    <input id="mType" type="hidden" value="password">
+  </div>
+</div>
+
+<!-- TOTP Display Modal -->
+<div id="totpModal" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal modal-narrow text-center">
+    <div class="totp-code" id="totpCode">------</div>
+    <div class="card-sub" id="totpLabel">رمز TOTP</div>
+    <div class="progress-bar">
+      <div id="totpProgress" class="progress-fill"></div>
+    </div>
+    <div id="totpTimer" class="timer-text">30</div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div id="importModal" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <h3>استيراد بيانات</h3>
+    <p class="card-sub">اختر الملف ونوع الاستيراد</p>
+    <select id="importFormat" class="select-control">
+      <option value="pg-json">PassGuard JSON</option>
+      <option value="bitwarden-json">Bitwarden JSON</option>
+      <option value="csv">CSV (Bitwarden/LastPass)</option>
+    </select>
+    <input type="file" id="importFile" accept=".json,.csv" class="file-input">
+    <div class="modal-footer">
+      <button id="importCancel" class="btn-ghost">إلغاء</button>
+      <button id="importConfirm" class="btn-primary">📥 استيراد</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIN Unlock Modal -->
+<div id="pinModal" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal modal-narrow text-center">
+    <div class="big-icon">🔐</div>
+    <h3>فتح سريع</h3>
+    <p class="card-sub">أدخل PIN للفتح السريع</p>
+    <input type="password" id="pinInput" placeholder="PIN" maxlength="8" class="pin-large-input">
+    <div class="modal-footer">
+      <button id="pinCancel" class="btn-ghost">إلغاء</button>
+      <button id="pinConfirm" class="btn-primary">🔓 فتح</button>
+    </div>
+  </div>
+</div>
+
+<script src="src/js/config.js"></script>
+<script src="src/js/crypto.js"></script>
+<script src="src/js/storage.js"></script>
+<script src="src/js/generator.js"></script>
+<script src="src/js/dashboard.js"></script>
+<script src="src/js/entries.js"></script>
+<script src="src/js/importer.js"></script>
+<script src="src/js/app.js"></script>
 </body>
 </html>

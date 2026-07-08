@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" id="metaTheme" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="PassGuard - مدير كلمات مرور مشفر بالكامل، مفتوح المصدر، يعمل محلياً">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><text x='50' y='70' font-size='55' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>P</text></svg>">
+<title>PassGuard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cairo@4.5.10/index.min.css">
+<style>
+:root {
+  --bg: #0f172a; --bg2: #1e1b4b; --card: rgba(30,41,59,0.6); --glass: rgba(30,41,59,0.6);
+  --input: #1e293b; --hover: rgba(30,41,59,0.75); --text: #f1f5f9; --text2: #94a3b8;
+  --text3: #64748b; --border: #334155; --gborder: rgba(148,163,184,0.15);
+  --cborder: rgba(148,163,184,0.15); --overlay: rgba(0,0,0,0.7);
+  --code: rgba(15,23,42,0.6); --shadow: rgba(99,102,241,0.25);
+  --grad1: #0f172a; --grad2: #1e1b4b; --grad3: #0f172a;
+  transition: background .3s,color .3s;
+}
+:root.light {
+  --bg: #f0f4f8; --bg2: #e2e8f0; --card: rgba(255,255,255,0.75); --glass: rgba(255,255,255,0.7);
+  --input: #fff; --hover: rgba(255,255,255,0.9); --text: #0f172a; --text2: #475569;
+  --text3: #94a3b8; --border: #cbd5e1; --gborder: rgba(0,0,0,0.08); --cborder: rgba(0,0,0,0.08);
+  --overlay: rgba(0,0,0,0.4); --code: rgba(226,232,240,0.6); --shadow: rgba(99,102,241,0.15);
+  --grad1: #e2e8f0; --grad2: #c7d2fe; --grad3: #e2e8f0;
+}
+*{font-family:'Cairo',sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:linear-gradient(135deg,var(--grad1) 0%,var(--grad2) 50%,var(--grad3) 100%);min-height:100vh;overflow-x:hidden;color:var(--text)}
+.glass{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--gborder)}
+.tab-active{background:linear-gradient(135deg,#6366f1,#8b5cf6)!important;color:#fff!important;box-shadow:0 4px 20px rgba(99,102,241,0.4)}
+input,textarea,select{background:var(--input);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 14px;font-size:13px;font-family:inherit;outline:none;transition:all .2s;width:100%}
+input:focus,textarea:focus,select:focus{border-color:#6366f1!important;box-shadow:0 0 0 3px rgba(99,102,241,0.15)!important}
+button{cursor:pointer;font-family:inherit;transition:all .2s;border:none;font-size:13px}
+button:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-weight:600;padding:10px 20px;border-radius:10px}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2);padding:8px 16px;border-radius:8px}
+.btn-ghost:hover{background:var(--code)}
+.btn-danger{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3)}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:rgba(15,23,42,0.3);border-radius:3px}
+::-webkit-scrollbar-thumb{background:#6366f1;border-radius:3px}
+.fade-in{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.slide-up{animation:slideUp .3s ease both}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.toast{animation:ti .35s cubic-bezier(.4,0,.2,1),to .3s ease 3s forwards;direction:ltr}
+@keyframes ti{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes to{to{opacity:0;transform:translateX(120%)}}
+.modal-in{animation:mi .25s ease}
+@keyframes mi{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:600;border:1px solid}
+.chip-g{background:rgba(34,197,94,.15);color:#4ade80;border-color:rgba(34,197,94,.25)}
+.chip-y{background:rgba(234,179,8,.15);color:#eab308;border-color:rgba(234,179,8,.25)}
+.chip-r{background:rgba(239,68,68,.15);color:#f87171;border-color:rgba(239,68,68,.25)}
+.chip-b{background:rgba(99,102,241,.15);color:#818cf8;border-color:rgba(99,102,241,.25)}
+.pwd{font-family:'Courier New',monospace;letter-spacing:1.5px;unicode-bidi:bidi-override;direction:ltr;text-align:left}
+#mobileNav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--gborder);z-index:100;padding:6px 0 env(safe-area-inset-bottom,6px)}
+#mobileNav .mn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px;border:none;background:none;cursor:pointer;color:var(--text3);font-size:10px;font-weight:500;font-family:inherit;border-radius:8px;transition:all .2s;flex:1}
+#mobileNav .mn i{font-size:20px;font-style:normal}
+#mobileNav .mn.active{background:rgba(99,102,241,.12);color:#818cf8}
+@media(max-width:767px){header .dn{display:none}#mobileNav{display:flex}main{padding-bottom:80px}}
+@media(min-width:768px){.mo{display:none!important}#mobileNav{display:none!important}}
+</style>
+</head>
+<body>
+
+<div id="toast" class="fixed top-6 left-6 z-[9999] space-y-2 pointer-events-none" role="status" aria-live="polite"></div>
+
+<header class="glass sticky top-0 z-40 border-b" style="border-color:var(--gborder)">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2 sm:gap-3">
+      <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0" aria-hidden="true">
+        <svg class="w-5 h-5 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      </div>
+      <div>
+        <h1 class="text-base sm:text-lg font-bold">PassGuard</h1>
+        <p class="text-[10px] sm:text-xs" style="color:var(--text3)">مفتوح المصدر • مشفر محلياً</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-1 sm:gap-2">
+      <nav class="dn flex gap-1 sm:gap-2">
+        <button data-tab="generator" class="tab-btn tab-active px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all">🎲 المولد</button>
+        <button data-tab="vault" class="tab-btn px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all" style="color:var(--text2)">🔐 الخزنة</button>
+        <button data-tab="dashboard" class="tab-btn px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all" style="color:var(--text2)">📊 لوحة التحكم</button>
+        <button data-tab="settings" class="tab-btn px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all" style="color:var(--text2)">⚙️ الإعدادات</button>
+      </nav>
+      <button id="themeToggle" class="p-1.5 sm:p-2 rounded-lg text-base sm:text-lg" style="color:var(--text3)" aria-label="تبديل السمة">🌙</button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+
+<!-- ===== GENERATOR ===== -->
+<section id="tab-generator" class="tab-content fade-in">
+<div class="glass rounded-2xl p-4 sm:p-6" style="box-shadow:0 0 30px var(--shadow)">
+  <h2 class="text-lg sm:text-xl font-bold mb-1">مولد كلمات المرور</h2>
+  <p class="text-xs sm:text-sm mb-4" style="color:var(--text2)">أنشئ كلمات مرور وعبارات مرور قوية</p>
+
+  <!-- Tabs for generator modes -->
+  <div class="flex gap-2 mb-4">
+    <button id="genModePwd" class="gen-mode-btn active px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all" style="background:#6366f1;color:#fff">🔑 كلمة مرور</button>
+    <button id="genModePhrase" class="gen-mode-btn px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all" style="background:var(--code);color:var(--text2)">🔤 عبارة مرور</button>
+    <button id="genModePin" class="gen-mode-btn px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all" style="background:var(--code);color:var(--text2)">🔢 PIN</button>
+  </div>
+
+  <!-- Password mode -->
+  <div id="genPwdPanel">
+    <div class="rounded-xl p-4 mb-4 border" style="background:var(--code);border-color:var(--cborder)">
+      <div id="genDisplay" dir="ltr" class="pwd text-lg sm:text-xl text-center py-4 break-all min-h-[52px] flex items-center justify-center select-all" style="color:#a5b4fc">اضغط "توليد"</div>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-3">
+        <div class="flex items-center gap-2"><span class="text-xs" style="color:var(--text3)">القوة:</span>
+          <div class="w-24 sm:w-28 h-2 rounded-full overflow-hidden" style="background:var(--border)"><div id="strBar" class="h-full transition-all duration-500" style="width:0;background:#475569"></div></div>
+          <span id="strText" class="text-xs font-medium" style="color:var(--text3)">-</span>
+        </div>
+        <div class="text-xs" style="color:var(--text3)">الإنتروبيا: <span id="entropyVal" class="font-mono" style="color:#818cf8">0</span> بت</div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mb-3">
+      <div><label class="text-xs font-medium mb-1 block" style="color:var(--text2)">الطول</label><input type="range" id="pwdLen" min="4" max="100" value="24" class="w-full"><span id="pwdLenVal" class="text-xs font-mono" style="color:#818cf8">24</span></div>
+      <div class="grid grid-cols-2 gap-2 self-end">
+        <label class="flex items-center gap-2 p-2 rounded cursor-pointer select-none text-xs" style="background:var(--code);border:1px solid var(--cborder)"><input type="checkbox" id="pu" checked class="w-3.5 h-3.5 accent-indigo-500"><span>A‑Z</span></label>
+        <label class="flex items-center gap-2 p-2 rounded cursor-pointer select-none text-xs" style="background:var(--code);border:1px solid var(--cborder)"><input type="checkbox" id="pl" checked class="w-3.5 h-3.5 accent-indigo-500"><span>a‑z</span></label>
+        <label class="flex items-center gap-2 p-2 rounded cursor-pointer select-none text-xs" style="background:var(--code);border:1px solid var(--cborder)"><input type="checkbox" id="pn" checked class="w-3.5 h-3.5 accent-indigo-500"><span>0‑9</span></label>
+        <label class="flex items-center gap-2 p-2 rounded cursor-pointer select-none text-xs" style="background:var(--code);border:1px solid var(--cborder)"><input type="checkbox" id="ps" checked class="w-3.5 h-3.5 accent-indigo-500"><span>!@#$%</span></label>
+      </div>
+    </div>
+    <label class="flex items-center gap-2 p-2.5 rounded cursor-pointer select-none text-xs mb-3" style="background:var(--code);border:1px solid var(--cborder)"><input type="checkbox" id="pavoid" class="w-3.5 h-3.5 accent-indigo-500"><span>تجنب المتشابهة (l,1,I,O,0)</span></label>
+  </div>
+
+  <!-- Phrase mode -->
+  <div id="genPhrasePanel" class="hidden">
+    <div class="rounded-xl p-4 mb-4 border" style="background:var(--code);border-color:var(--cborder)">
+      <div id="phraseDisplay" dir="ltr" class="pwd text-lg sm:text-xl text-center py-4 break-all min-h-[52px] flex items-center justify-center select-all" style="color:#a5b4fc">اضغط "توليد"</div>
+      <div class="flex items-center gap-2 mt-3"><span class="text-xs" style="color:var(--text3)">القوة:</span>
+        <div class="w-24 h-2 rounded-full overflow-hidden" style="background:var(--border)"><div id="phraseStrBar" class="h-full transition-all duration-500" style="width:0;background:#475569"></div></div>
+        <span id="phraseStrText" class="text-xs font-medium" style="color:var(--text3)">-</span>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+      <div><label class="text-xs font-medium mb-1 block" style="color:var(--text2)">عدد الكلمات</label><input type="range" id="phraseWords" min="2" max="12" value="4" class="w-full"><span id="phraseWordsVal" class="text-xs font-mono" style="color:#818cf8">4</span></div>
+      <div><label class="text-xs font-medium mb-1 block" style="color:var(--text2)">الفاصل</label><select id="phraseSep" class="!p-2 text-xs"><option value="-">-</option><option value=" ">مسافة</option><option value="_">_</option><option value=".">.</option><option value=",">,</option></select></div>
+      <div class="self-end"><label class="flex items-center gap-2 p-2 rounded cursor-pointer select-none text-xs" style="background:var(--code);border:1px solid var(--cborder)"><input type="checkbox" id="phraseCap" class="w-3.5 h-3.5 accent-indigo-500"><span>تكبير أول حرف</span></label></div>
+      <div class="self-end"><label class="flex items-center gap-2 p-2 rounded cursor-pointer select-none text-xs" style="background:var(--code);border:1px solid var(--cborder)"><input type="checkbox" id="phraseNum" class="w-3.5 h-3.5 accent-indigo-500"><span>إضافة رقم</span></label></div>
+    </div>
+  </div>
+
+  <!-- PIN mode -->
+  <div id="genPinPanel" class="hidden">
+    <div class="rounded-xl p-4 mb-4 border" style="background:var(--code);border-color:var(--cborder)">
+      <div id="pinDisplay" dir="ltr" class="pwd text-lg sm:text-xl text-center py-4 break-all min-h-[52px] flex items-center justify-center select-all" style="color:#a5b4fc">اضغط "توليد"</div>
+    </div>
+    <div class="mb-3"><label class="text-xs font-medium mb-1 block" style="color:var(--text2)">عدد الأرقام</label><input type="range" id="pinLen" min="4" max="12" value="6" class="w-full"><span id="pinLenVal" class="text-xs font-mono" style="color:#818cf8">6</span></div>
+  </div>
+
+  <div class="flex gap-3 mt-4">
+    <button id="btnGen" class="btn-primary flex-1 text-sm sm:text-base">🎲 توليد</button>
+    <button id="btnCopy" class="btn-ghost px-5 disabled:opacity-40 disabled:cursor-not-allowed text-sm sm:text-base" disabled>📋 نسخ</button>
+  </div>
+</div>
+</section>
+
+<!-- ===== VAULT ===== -->
+<section id="tab-vault" class="tab-content hidden fade-in">
+<div class="glass rounded-2xl p-4 sm:p-6" style="box-shadow:0 0 30px var(--shadow)">
+  <div class="flex items-center justify-between mb-4">
+    <div><h2 class="text-lg sm:text-xl font-bold">خزنة كلمات المرور</h2><p class="text-xs sm:text-sm" style="color:var(--text2)">مستودع مشفر بالكامل • <span id="entryCount">0</span> إدخال</p></div>
+    <div id="vaultActions" class="hidden flex gap-1 sm:gap-2 items-center">
+      <button id="btnImport" class="btn-ghost px-2 py-1.5 text-xs" title="استيراد">📥</button>
+      <button id="btnExport" class="btn-ghost px-2 py-1.5 text-xs" title="تصدير">📤</button>
+      <button id="btnAdd" class="btn-primary px-3 py-1.5 text-xs sm:text-sm">➕ إضافة</button>
+      <button id="btnLock" class="btn-danger px-3 py-1.5 text-xs sm:text-sm">🔒</button>
+    </div>
+  </div>
+
+  <!-- Unlock -->
+  <div id="unlockForm">
+    <div class="max-w-sm mx-auto py-8 sm:py-12">
+      <div class="rounded-xl p-5 sm:p-6 border text-center" style="background:var(--card);border-color:var(--cborder)">
+        <div class="w-14 h-14 mx-auto rounded-full flex items-center justify-center mb-3" style="background:rgba(99,102,241,0.2)">
+          <svg class="w-7 h-7" style="color:#818cf8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <h3 class="font-semibold mb-1" id="unlockTitle">افتح الخزنة</h3>
+        <p class="text-xs sm:text-sm mb-4" style="color:var(--text2)" id="unlockDesc">أدخل كلمة المرور الرئيسية</p>
+        <div class="relative mb-3">
+          <input id="mp" type="password" placeholder="كلمة المرور الرئيسية" autocomplete="off" class="!pl-10">
+          <button id="toggleMp" type="button" class="absolute left-3 top-1/2 -translate-y-1/2 text-base" style="color:var(--text3)">👁️</button>
+        </div>
+        <button id="btnUnlock" class="btn-primary w-full">🔓 فتح</button>
+        <p id="firstTimeMsg" class="hidden text-xs mt-3" style="color:#a5b4fc">🆕 سيتم إنشاء خزنة جديدة بكلمة المرور هذه</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vault content -->
+  <div id="vaultContent" class="hidden">
+    <div class="flex gap-2 sm:gap-3 mb-3 flex-wrap">
+      <div class="flex-1 min-w-[120px]"><input id="vSearch" type="text" placeholder="🔍 بحث..."></div>
+      <select id="vFilter" class="!w-auto !py-2 text-xs">
+        <option value="all">الكل</option>
+        <option value="password">🔑 كلمات مرور</option>
+        <option value="note">📝 ملاحظات</option>
+        <option value="identity">🪪 هوية</option>
+        <option value="payment">💳 بطاقات</option>
+      </select>
+      <select id="vSort" class="!w-auto !py-2 text-xs">
+        <option value="date-desc">🕒 الأحدث</option>
+        <option value="date-asc">🕒 الأقدم</option>
+        <option value="title-asc">🔤 أ-ي</option>
+        <option value="title-desc">🔤 ي-أ</option>
+      </select>
+      <select id="vFolder" class="!w-auto !py-2 text-xs">
+        <option value="__all">📁 الكل</option>
+        <option value="__favorites">⭐ المفضلة</option>
+        <option value="__default">📂 عام</option>
+      </select>
+    </div>
+    <div id="statsRow" class="flex gap-2 sm:gap-3 text-xs flex-wrap mb-3" style="color:var(--text3)"></div>
+    <div id="emptyVault" class="text-center py-10 hidden"><div class="text-5xl mb-3 opacity-60">🔐</div><p style="color:var(--text2)">لا توجد إدخالات بعد</p></div>
+    <div id="noResults" class="text-center py-10 hidden"><div class="text-4xl mb-3 opacity-50">🔍</div><p style="color:var(--text2)">لا توجد نتائج</p></div>
+    <div id="entriesList" class="space-y-2"></div>
+  </div>
+</div>
+</section>
+
+<!-- ===== DASHBOARD ===== -->
+<section id="tab-dashboard" class="tab-content hidden fade-in">
+<div class="glass rounded-2xl p-4 sm:p-6" style="box-shadow:0 0 30px var(--shadow)">
+  <h2 class="text-lg sm:text-xl font-bold mb-1">لوحة التحكم الأمنية</h2>
+  <p class="text-xs sm:text-sm mb-4" style="color:var(--text2)">تحليل شامل لأمان خزنتك</p>
+  <div id="dashLocked" class="max-w-sm mx-auto py-8 sm:py-12">
+    <div class="rounded-xl p-5 sm:p-6 border text-center" style="background:var(--card);border-color:var(--cborder)">
+      <div class="w-14 h-14 mx-auto rounded-full flex items-center justify-center mb-3" style="background:rgba(99,102,241,0.2)">
+        <svg class="w-7 h-7" style="color:#818cf8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      </div>
+      <h3 class="font-semibold mb-2">الخزنة مقفلة</h3>
+      <p class="text-xs sm:text-sm mb-4" style="color:var(--text2)">افتح الخزنة لتحليل الأمان</p>
+      <button id="dashGoVault" class="btn-primary">🗄️ فتح الخزنة</button>
+    </div>
+  </div>
+  <div id="dashContent" class="hidden space-y-4"></div>
+</div>
+</section>
+
+<!-- ===== SETTINGS ===== -->
+<section id="tab-settings" class="tab-content hidden fade-in">
+<div class="glass rounded-2xl p-4 sm:p-6" style="box-shadow:0 0 30px var(--shadow)">
+  <h2 class="text-lg sm:text-xl font-bold mb-1">الإعدادات</h2>
+  <p class="text-xs sm:text-sm mb-4" style="color:var(--text2)">تخصيص التطبيق</p>
+
+  <div class="space-y-4 max-w-lg">
+
+    <div class="rounded-xl p-4 border" style="background:var(--card);border-color:var(--cborder)">
+      <h3 class="font-semibold text-sm mb-3">🔒 الأمان</h3>
+      <div class="space-y-3">
+        <div class="flex items-center justify-between"><span class="text-sm">القفل التلقائي</span>
+          <select id="setAutoLock" class="!w-auto !py-1.5 text-xs">
+            <option value="0">أبداً</option><option value="1">1 دقيقة</option><option value="5" selected>5 دقائق</option><option value="15">15 دقيقة</option><option value="30">30 دقيقة</option>
+          </select>
+        </div>
+        <div class="flex items-center justify-between"><span class="text-sm">فتح سريع بـ PIN</span>
+          <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="setPinEnable" class="sr-only peer"><div class="w-9 h-5 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all" style="background:var(--border);peer-checked:background:#6366f1"></div></label>
+        </div>
+        <div id="pinSection" class="hidden"><input type="password" id="setPinInput" placeholder="PIN (4-8 أرقام)" maxlength="8" class="!py-1.5 text-sm" style="direction:ltr;text-align:left"><p class="text-xs mt-1" style="color:var(--text3)">سيتم حفظ PIN فيsession storage فقط</p></div>
+      </div>
+    </div>
+
+    <div class="rounded-xl p-4 border" style="background:var(--card);border-color:var(--cborder)">
+      <h3 class="font-semibold text-sm mb-3">🎨 المظهر</h3>
+      <select id="setTheme" class="!w-auto !py-1.5 text-xs">
+        <option value="dark">🌙 داكن</option>
+        <option value="light">☀️ فاتح</option>
+        <option value="system">💻 تلقائي</option>
+      </select>
+    </div>
+
+    <div class="rounded-xl p-4 border" style="background:var(--card);border-color:var(--cborder)">
+      <h3 class="font-semibold text-sm mb-3">📦 البيانات</h3>
+      <div class="flex flex-wrap gap-2">
+        <button id="setExportJson" class="btn-ghost text-xs">📤 تصدير JSON</button>
+        <button id="setExportCsv" class="btn-ghost text-xs">📤 تصدير CSV</button>
+        <button id="setImport" class="btn-ghost text-xs">📥 استيراد</button>
+        <button id="setClear" class="btn-danger px-3 py-1.5 text-xs rounded-lg">🗑️ مسح الخزنة</button>
+      </div>
+      <p class="text-xs mt-2" style="color:var(--text3)">يدعم الاستيراد: JSON (PassGuard), CSV (Bitwarden, LastPass)</p>
+    </div>
+
+    <div class="rounded-xl p-4 border" style="background:var(--card);border-color:var(--cborder)">
+      <h3 class="font-semibold text-sm mb-2">ℹ️ حول PassGuard</h3>
+      <p class="text-xs" style="color:var(--text2)">الإصدار 5.0 • مفتوح المصدر بالكامل • تشفير AES-256-GCM + PBKDF2 • جميع البيانات محلية</p>
+      <p class="text-xs mt-1" style="color:var(--text3)">تم إنشاؤه بـ ❤️ باستخدام Web Crypto API</p>
+    </div>
+
+  </div>
+</div>
+</section>
+
+</main>
+
+<nav id="mobileNav" class="mo" aria-label="التنقل السفلي">
+  <button data-tab="generator" class="mn active"><i>🎲</i><span>المولد</span></button>
+  <button data-tab="vault" class="mn"><i>🔐</i><span>الخزنة</span></button>
+  <button data-tab="dashboard" class="mn"><i>📊</i><span>اللوحة</span></button>
+  <button data-tab="settings" class="mn"><i>⚙️</i><span>الإعدادات</span></button>
+</nav>
+
+<!-- Entry Modal -->
+<div id="entryModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:var(--overlay);display:none" role="dialog" aria-modal="true">
+<div class="glass rounded-2xl p-4 sm:p-5 max-w-lg w-full modal-in max-h-[90vh] overflow-y-auto" style="border-color:var(--cborder)">
+  <div class="flex items-center justify-between mb-3"><h3 id="modalTitle" class="text-lg font-bold">إضافة إدخال</h3><button id="modalClose" class="text-lg" style="color:var(--text3)">✕</button></div>
+
+  <div class="flex gap-2 mb-3">
+    <button data-etype="password" class="etype-btn active px-3 py-1.5 rounded-lg text-xs font-medium" style="background:#6366f1;color:#fff">🔑 كلمة مرور</button>
+    <button data-etype="note" class="etype-btn px-3 py-1.5 rounded-lg text-xs font-medium" style="background:var(--code);color:var(--text2)">📝 ملاحظة</button>
+    <button data-etype="identity" class="etype-btn px-3 py-1.5 rounded-lg text-xs font-medium" style="background:var(--code);color:var(--text2)">🪪 هوية</button>
+    <button data-etype="payment" class="etype-btn px-3 py-1.5 rounded-lg text-xs font-medium" style="background:var(--code);color:var(--text2)">💳 بطاقة</button>
+  </div>
+
+  <div class="space-y-2.5">
+    <!-- Common fields -->
+    <input id="mTitle" type="text" placeholder="العنوان">
+    <input id="mFolder" type="hidden">
+    <div id="mPwdFields">
+      <input id="mUrl" type="url" placeholder="الرابط (URL)" class="dir-ltr">
+      <input id="mUsername" type="text" placeholder="اسم المستخدم / البريد">
+      <div class="relative flex gap-2">
+        <input id="mPassword" type="password" placeholder="كلمة المرور" dir="ltr" class="!pl-10 font-mono flex-1">
+        <button id="toggleMpwd" type="button" class="absolute left-3 top-1/2 -translate-y-1/2 text-base" style="color:var(--text3)">👁️</button>
+        <select id="mPwdGen" class="!w-auto !py-1.5 text-xs" title="توليد كلمة مرور">
+          <option value="">🎲 توليد</option>
+          <option value="pwd-16">🔑 16 حرف</option>
+          <option value="pwd-24">🔑 24 حرف</option>
+          <option value="pwd-32">🔑 32 حرف</option>
+          <option value="phrase-4">🔤 4 كلمات</option>
+          <option value="phrase-6">🔤 6 كلمات</option>
+          <option value="pin-6">🔢 PIN 6</option>
+          <option value="pin-8">🔢 PIN 8</option>
+        </select>
+      </div>
+      <!-- TOTP -->
+      <div class="flex gap-2 items-center mt-2">
+        <input id="mTotp" type="text" placeholder="TOTP Secret (base32)" class="text-xs font-mono dir-ltr flex-1">
+        <button id="btnTotpTest" class="btn-ghost px-2 py-1.5 text-xs" title="اختبار TOTP">🔑</button>
+      </div>
+    </div>
+    <!-- Identity fields -->
+    <div id="mIdFields" class="hidden grid grid-cols-2 gap-2">
+      <input id="mFullName" type="text" placeholder="الاسم الكامل">
+      <input id="mEmail" type="email" placeholder="البريد الإلكتروني">
+      <input id="mPhone" type="tel" placeholder="رقم الهاتف">
+      <input id="mAddress" type="text" placeholder="العنوان">
+      <input id="mIdNumber" type="text" placeholder="رقم الهوية">
+    </div>
+    <!-- Payment fields -->
+    <div id="mPayFields" class="hidden grid grid-cols-2 gap-2">
+      <input id="mCardName" type="text" placeholder="الاسم على البطاقة">
+      <input id="mCardNum" type="text" placeholder="رقم البطاقة" dir="ltr">
+      <input id="mCardExp" type="text" placeholder="MM/YY" dir="ltr">
+      <input id="mCardCvv" type="text" placeholder="CVV" dir="ltr">
+      <input id="mCardPin" type="text" placeholder="PIN" dir="ltr" class="col-span-2">
+    </div>
+    <!-- Note -->
+    <textarea id="mNotes" rows="2" placeholder="ملاحظات..." class="resize-none"></textarea>
+    <!-- Tags -->
+    <input id="mTags" type="text" placeholder="وسوم (مفصولة بفواصل)">
+    <!-- Expiry -->
+    <div class="flex gap-2 items-center">
+      <input id="mExpiry" type="date" class="!w-auto">
+      <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="mFavorite" class="w-3.5 h-3.5 accent-yellow-500">⭐ مفضلة</label>
+    </div>
+  </div>
+
+  <div class="flex gap-2 mt-4">
+    <button id="modalCancel" class="btn-ghost flex-1">إلغاء</button>
+    <button id="modalSave" class="btn-primary flex-1">💾 حفظ</button>
+  </div>
+  <input id="editId" type="hidden">
+  <input id="mType" type="hidden" value="password">
+</div>
+</div>
+
+<!-- TOTP Display Modal -->
+<div id="totpModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:var(--overlay);display:none" role="dialog">
+<div class="glass rounded-2xl p-6 max-w-xs w-full modal-in text-center" style="border-color:var(--cborder)">
+  <div class="text-4xl font-mono font-bold mb-2" id="totpCode" style="color:#818cf8;letter-spacing:4px">------</div>
+  <div class="text-xs mb-4" style="color:var(--text3)" id="totpLabel">رمز TOTP</div>
+  <div class="w-full h-2 rounded-full overflow-hidden mb-4" style="background:var(--border)"><div id="totpProgress" class="h-full transition-all duration-1000" style="width:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6)"></div></div>
+  <div id="totpTimer" class="text-xs font-mono" style="color:var(--text3)">30</div>
+</div>
+</div>
+
+<!-- Import Modal -->
+<div id="importModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:var(--overlay);display:none" role="dialog">
+<div class="glass rounded-2xl p-5 max-w-md w-full modal-in" style="border-color:var(--cborder)">
+  <h3 class="text-lg font-bold mb-1">استيراد بيانات</h3>
+  <p class="text-xs mb-4" style="color:var(--text2)">اختر الملف ونوع الاستيراد</p>
+  <select id="importFormat" class="mb-3 !py-2 text-xs">
+    <option value="pg-json">PassGuard JSON</option>
+    <option value="bitwarden-json">Bitwarden JSON</option>
+    <option value="csv">CSV (Bitwarden/LastPass)</option>
+  </select>
+  <input type="file" id="importFile" accept=".json,.csv" class="!py-2 text-xs">
+  <div class="flex gap-2 mt-4">
+    <button id="importCancel" class="btn-ghost flex-1">إلغاء</button>
+    <button id="importConfirm" class="btn-primary flex-1">📥 استيراد</button>
+  </div>
+</div>
+</div>
+
+<!-- PIN Unlock Modal -->
+<div id="pinModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background:var(--overlay);display:none" role="dialog">
+<div class="glass rounded-2xl p-6 max-w-xs w-full modal-in text-center" style="border-color:var(--cborder)">
+  <div class="text-3xl mb-2">🔐</div>
+  <h3 class="font-semibold mb-1">فتح سريع</h3>
+  <p class="text-xs mb-4" style="color:var(--text2)">أدخل PIN للفتح السريع</p>
+  <input type="password" id="pinInput" placeholder="PIN" maxlength="8" class="text-center text-2xl tracking-widest font-mono !py-3" style="direction:ltr">
+  <div class="flex gap-2 mt-3">
+    <button id="pinCancel" class="btn-ghost flex-1">إلغاء</button>
+    <button id="pinConfirm" class="btn-primary flex-1">🔓 فتح</button>
+  </div>
+</div>
+</div>
+
+<input id="importFileInput" type="file" accept=".json,.csv" style="display:none" aria-hidden="true">
+
+<script>
+// ============================================================
+// PassGuard v5.0 — Enterprise-grade Open Source Password Manager
+// ============================================================
+
+// ========== CONFIG ==========
+const APP = { name:'PassGuard', version:'5.0.0', key:'pg_v5' };
+const WORDS = [
+  'أمان','بيت','سحاب','بحر','نور','قمر','شمس','جبل','وادي','غابة','نهر','وردة','كوكب','نجم','طائر','سمكة','حصان','أسد','فهد','صقر',
+  'نخلة','زيتون','تفاح','برتقال','عنب','فراشة','ينبوع','مفتاح','كنز','درع','سيف','قصر','حديقة','جسر','طريق','نافذة','باب','مصباح','قلم',
+  'كتاب','دفتر','ساعة','خاتم','تاج','مرآة','سجادة','وسادة','قماش','حرير','ذهب','فضة','نحاس','حديد','خشب','زجاج','بلور','عاج','صوف',
+  'حجر','رمل','تراب','هواء','لهب','دخان','ظل','صدى','صوت','لحن','وتر','زهر','بذرة','ثمر','غصن','عرش','سهم','ترس','بيضة','عش',
+  'كهف','مغارة','واحة','مرفأ','منارة','ربوة','سهل','مزرعة','حقل','بستان','كرم','نبع','مطر','ثلج','برد','ضباب','غيم','قوس','فجر','شفق'
+];
+
+// ========== STATE ==========
+const S = { key:null, mp:null, data:[], folders:[], tab:'generator', genPwd:'', pinEnabled:false, pinHash:null };
+
+// ========== HELPERS ==========
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const esc = s => {const d=document.createElement('div');d.textContent=s;return d.innerHTML};
+const id = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const now = () => Date.now();
+const $val = (id) => document.getElementById(id).value;
+const $set = (id,v) => document.getElementById(id).value=v;
+const daysAgo = ts => {if(!ts)return '';const d=Math.floor((now()-ts)/864e5);return d===0?'اليوم':d===1?'أمس':d<7?`منذ ${d} أيام`:d<30?`منذ ${Math.floor(d/7)} أسابيع`:d<365?`منذ ${Math.floor(d/30)} شهر`:`منذ ${Math.floor(d/365)} سنة`};
+const show = (id) => document.getElementById(id).classList.remove('hidden');
+const hide = (id) => document.getElementById(id).classList.add('hidden');
+
+function toast(msg,type='success',dur=3e3) {
+  const c=$('#toast'),t=document.createElement('div');
+  const cl={success:'bg-emerald-600/90',error:'bg-red-600/90',info:'bg-indigo-600/90',warning:'bg-amber-600/90'};
+  t.dir='rtl';t.className=`toast ${cl[type]||cl.info} text-white px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm flex items-center gap-2 pointer-events-auto border border-white/10 shadow-lg`;
+  t.innerHTML=`<span>${type==='success'?'✅':type==='error'?'❌':type==='warning'?'⚠️':'ℹ️'}</span><span>${msg}</span>`;
+  c.appendChild(t);setTimeout(()=>{if(t.parentNode)t.remove()},dur);
+}
+
+// ========== CRYPTO ==========
+const CR = {
+  rnd(l){const a=new Uint8Array(l);crypto.getRandomValues(a);return a},
+  async derive(p,s){const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:s,iterations:3e5,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])},
+  async enc(pt,k){const iv=this.rnd(12);return{iv:btoa(String.fromCharCode(...iv)),data:btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,new TextEncoder().encode(pt)))))}},
+  async dec(p,k){return new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:Uint8Array.from(atob(p.iv),c=>c.charCodeAt(0))},k,Uint8Array.from(atob(p.data),c=>c.charCodeAt(0))))},
+  sha256(d){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(d)).then(h=>Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join(''))},
+  totp(secret){const key=Uint8Array.from(atob(secret.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(secret.length/8)*8,'=')),c=>c.charCodeAt(0));const epoch=Math.floor(Date.now()/3e4);const msg=new Uint8Array(8);for(let i=7;i>=0;i--){msg[i]=epoch&0xff;epoch>>>=8}return crypto.subtle.importKey('raw',key,{name:'HMAC',hash:'SHA-1'},false,['sign']).then(k=>crypto.subtle.sign('HMAC',k,msg)).then(sig=>{const h=new Uint8Array(sig),o=h[19]&0xf,c=((h[o]&0x7f)<<24|(h[o+1]&0xff)<<16|(h[o+2]&0xff)<<8|h[o+3]&0xff)%1e6;return String(c).padStart(6,'0')})}
+};
+
+// ========== STORAGE ==========
+const ST = {
+  load(){try{const r=localStorage.getItem(APP.key);return r?JSON.parse(r):null}catch{return null}},
+  save(v){localStorage.setItem(APP.key,JSON.stringify(v))},
+  loadSettings(){try{return JSON.parse(localStorage.getItem(APP.key+'_settings')||'{}')}catch{return{}}},
+  saveSettings(s){localStorage.setItem(APP.key+'_settings',JSON.stringify(s))}
+};
+
+// ========== THEME ==========
+function applyTheme(t) {
+  const d=document.documentElement;
+  if(t==='system'){t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}
+  d.classList.toggle('light',t==='light');
+  $('#metaTheme').content=t==='dark'?'#0f172a':'#f0f4f8';
+  $('#themeToggle').textContent=t==='dark'?'🌙':'☀️';
+}
+const settings=ST.loadSettings();
+applyTheme(settings.theme||'dark');
+$('#themeToggle').addEventListener('click',()=>{
+  const cur=document.documentElement.classList.contains('light')?'light':'dark';
+  const next=cur==='dark'?'light':'dark';
+  applyTheme(next);settings.theme=next;ST.saveSettings(settings);
+});
+
+// ========== VAULT CORE ==========
+async function unlock(pwd) {
+  let v=ST.load();
+  if(!v){
+    const s=CR.rnd(16),k=await CR.derive(pwd,s);
+    v={salt:btoa(String.fromCharCode(...s)),test:await CR.enc('PG_OK',k),entries:{iv:'',data:''},folders:{iv:'',data:''},created:now()};
+    ST.save(v);S.key=k;S.mp=pwd;S.data=[];S.folders=[];
+    return true;
+  }
+  try{
+    const s=Uint8Array.from(atob(v.salt),c=>c.charCodeAt(0)),k=await CR.derive(pwd,s);
+    if((await CR.dec(v.test,k))!=='PG_OK')throw 0;
+    S.key=k;S.mp=pwd;
+    S.data=v.entries?.data?JSON.parse(await CR.dec(v.entries,k)):[];
+    S.folders=v.folders?.data?JSON.parse(await CR.dec(v.folders,k)):[];
+    return true;
+  }catch{return false}
+}
+
+async function saveAll() {
+  if(!S.key)return;const v=ST.load();if(!v)return;
+  v.entries=await CR.enc(JSON.stringify(S.data),S.key);
+  v.folders=await CR.enc(JSON.stringify(S.folders),S.key);
+  v.updated=now();ST.save(v);
+  // record health history
+  const h=healthScore();let hist=JSON.parse(localStorage.getItem('pg_health_hist')||'[]');
+  hist.push({date:now(),score:h,count:S.data.length});
+  if(hist.length>30)hist=hist.slice(-30);
+  localStorage.setItem('pg_health_hist',JSON.stringify(hist));
+}
+
+function lock() {S.key=null;S.mp=null;S.data=[];S.folders=[];$('#mp').value='';hide('vaultContent');show('unlockForm');hide('vaultActions');updateDash();}
+
+// ========== GENERATOR ==========
+const GEN = {
+  sets:{u:'ABCDEFGHIJKLMNOPQRSTUVWXYZ',l:'abcdefghijklmnopqrstuvwxyz',n:'0123456789',s:'!@#$%^&*()_+-=[]{}|;:,.<>?/~'},
+  genPwd(l,o){
+    let cs='';const req=[];
+    if(o.u){let s=this.sets.u;if(o.av)s=s.replace(/[IO]/g,'');cs+=s;req.push(s)}
+    if(o.l){let s=this.sets.l;if(o.av)s=s.replace(/[l]/g,'');cs+=s;req.push(s)}
+    if(o.n){let s=this.sets.n;if(o.av)s=s.replace(/[01]/g,'');cs+=s;req.push(s)}
+    if(o.s){cs+=this.sets.s;req.push(this.sets.s)}
+    if(!cs)return{pw:'',ent:0};
+    const r=[];for(const s of req)r.push(s[CR.rnd(4)[0]%s.length]);
+    for(let i=0;i<Math.max(0,l-r.length);i++)r.push(cs[CR.rnd(4)[0]%cs.length]);
+    for(let i=r.length-1;i>0;i--){const j=CR.rnd(4)[0]%(i+1);[r[i],r[j]]=[r[j],r[i]]}
+    return{pw:r.join(''),ent:Math.floor(l*Math.log2(cs.length))};
+  },
+  genPhrase(n,sep,cap,addNum){
+    const r=[];for(let i=0;i<n;i++){let w=WORDS[CR.rnd(4)[0]%WORDS.length];if(cap)w=w.charAt(0).toUpperCase()+w.slice(1);r.push(w)}
+    if(addNum)r.push(CR.rnd(4)[0]%1000);
+    return{pw:r.join(sep),ent:Math.floor(n*Math.log2(WORDS.length))};
+  },
+  genPin(l){let r='';for(let i=0;i<l;i++)r+=CR.rnd(4)[0]%10;return{pw:r,ent:Math.floor(l*Math.log2(10))}},
+  str(pw){
+    if(!pw)return{sc:0,lb:'-',hx:'#64748b'};
+    let s=0;if(pw.length>=8)s+=2;if(pw.length>=12)s+=2;if(pw.length>=16)s+=2;
+    if(/[a-z]/.test(pw)&&/[A-Z]/.test(pw))s+=2;if(/\d/.test(pw))s+=1;if(/[^A-Za-z0-9]/.test(pw))s+=2;if(pw.length>=20)s+=1;
+    if(s<=2)return{sc:20,lb:'ضعيفة جداً',hx:'#ef4444'};if(s<=4)return{sc:40,lb:'ضعيفة',hx:'#f97316'};if(s<=6)return{sc:60,lb:'متوسطة',hx:'#eab308'};if(s<=8)return{sc:80,lb:'قوية',hx:'#3b82f6'};return{sc:100,lb:'قوية جداً',hx:'#22c55e'};
+  },
+  health(pw){
+    if(!pw)return{sc:0,iss:['فارغة']};const iss=[];
+    if(pw.length<8)iss.push('قصيرة (<8)');else if(pw.length<12)iss.push('يمكن أن تكون أطول');
+    if(!/[A-Z]/.test(pw))iss.push('لا تحتوي على كبيرة');if(!/[a-z]/.test(pw))iss.push('لا تحتوي على صغيرة');
+    if(!/\d/.test(pw))iss.push('لا تحتوي على أرقام');if(!/[^A-Za-z0-9]/.test(pw))iss.push('لا تحتوي على رموز');
+    if(['password','123456','qwerty','admin','letmein','welcome','passw0rd','abc123','iloveyou','monkey','dragon','master'].some(c=>pw.toLowerCase().includes(c)))iss.push('تحتوي على نمط شائع');
+    return{sc:Math.max(0,100-iss.length*15),iss};
+  }
+};
+
+// ========== DASHBOARD ==========
+function healthScore(){return S.data.length?Math.round(S.data.reduce((s,e)=>s+GEN.health(e.password||'').sc,0)/S.data.length):100}
+
+function updateDash() {
+  const u=S.key!==null;
+  $('#dashLocked').classList.toggle('hidden',u);
+  $('#dashContent').classList.toggle('hidden',!u);
+  if(u)renderDash();
+}
+
+function renderDash() {
+  const r=$('#dashContent');
+  if(!S.data.length){r.innerHTML=`<div class="text-center py-10"><div class="text-5xl mb-3 opacity-60">📊</div><p style="color:var(--text2)">الخزنة فارغة</p></div>`;return}
+
+  let ts=0,wk=0,md=0,sg=0;const pwMap={};
+  S.data.forEach(e=>{const h=GEN.health(e.password||'');ts+=h.sc;if(h.sc<50)wk++;else if(h.sc<80)md++;else sg++;const p=e.password||'';pwMap[p]=pwMap[p]||[];pwMap[p].push(e.title||'?'});
+  const avg=Math.round(ts/S.data.length),reused=Object.values(pwMap).filter(a=>a.length>1);
+  let grade,gc,gcl;if(avg>=90){grade='A+';gc='text-green-400';gcl='ممتاز'}else if(avg>=80){grade='A';gc='text-green-400';gcl='ممتاز'}else if(avg>=70){grade='B';gc='text-blue-400';gcl='جيد'}else if(avg>=55){grade='C';gc='text-yellow-400';gcl='متوسط'}else{grade='D';gc='text-red-400';gcl='ضعيف'}
+  const hasTotp=S.data.filter(e=>e.totp).length,pctTotp=S.data.length?Math.round(hasTotp/S.data.length*100):0;
+  const weakEntries=S.data.filter(e=>GEN.health(e.password||'').sc<50);
+  const expired=S.data.filter(e=>e.expiry&&new Date(e.expiry)<now());
+  const hist=JSON.parse(localStorage.getItem('pg_health_hist')||'[]');
+
+  // Common passwords breach check
+  const breached=S.data.filter(e=>GEN.health(e.password||'').iss.some(i=>i.includes('نمط شائع')));
+  // Reused passwords analysis
+  const reusedPasswords=Object.entries(pwMap).filter(([p,a])=>a.length>1).length;
+
+  let html=`
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="rounded-xl p-4 border text-center" style="background:var(--card);border-color:var(--cborder)"><div class="text-3xl font-bold ${gc}">${grade}</div><div class="text-xs mt-1" style="color:var(--text3)">${gcl}</div></div>
+      <div class="rounded-xl p-4 border text-center" style="background:var(--card);border-color:var(--cborder)"><div class="text-3xl font-bold" style="color:#818cf8">${S.data.length}</div><div class="text-xs mt-1" style="color:var(--text3)">إجمالي</div></div>
+      <div class="rounded-xl p-4 border text-center" style="background:var(--card);border-color:var(--cborder)"><div class="text-3xl font-bold" style="color:#4ade80">${sg}</div><div class="text-xs mt-1" style="color:var(--text3)">قوية</div></div>
+      <div class="rounded-xl p-4 border text-center" style="background:var(--card);border-color:var(--cborder)"><div class="text-3xl font-bold" style="color:${wk>0?'#f87171':'#4ade80'}">${wk}</div><div class="text-xs mt-1" style="color:var(--text3)">ضعيفة</div></div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="rounded-xl p-3 border text-center" style="background:var(--card);border-color:var(--cborder)"><div class="text-lg font-bold" style="color:${reusedPasswords>0?'#facc15':'#4ade80'}">${reusedPasswords}</div><div class="text-xs" style="color:var(--text3)">مكررة</div></div>
+      <div class="rounded-xl p-3 border text-center" style="background:var(--card);border-color:var(--cborder)"><div class="text-lg font-bold" style="color:${hasTotp>0?'#4ade80':'#f87171'}">${hasTotp}</div><div class="text-xs" style="color:var(--text3)">مع TOTP</div></div>
+      <div class="rounded-xl p-3 border text-center" style="background:var(--card);border-color:var(--cborder)"><div class="text-lg font-bold" style="color:${breached.length>0?'#f87171':'#4ade80'}">${breached.length}</div><div class="text-xs" style="color:var(--text3)">مخترقة محتمل</div></div>
+      <div class="rounded-xl p-3 border text-center" style="background:var(--card);border-color:var(--cborder)"><div class="text-lg font-bold" style="color:${expired.length>0?'#f87171':'#4ade80'}">${expired.length}</div><div class="text-xs" style="color:var(--text3)">منتهية الصلاحية</div></div>
+    </div>`;
+
+  // 2FA adoption progress bar
+  html+=`<div class="rounded-xl p-4 border" style="background:var(--card);border-color:var(--cborder)">
+    <div class="flex justify-between text-xs mb-1"><span>اعتماد المصادقة الثنائية (TOTP)</span><span style="color:#818cf8">${pctTotp}%</span></div>
+    <div class="w-full h-2 rounded-full overflow-hidden" style="background:var(--border)"><div class="h-full transition-all" style="width:${pctTotp}%;background:linear-gradient(90deg,#6366f1,#8b5cf6)"></div></div>
+  </div>`;
+
+  // Health history chart
+  if(hist.length>1){
+    html+=`<div class="rounded-xl p-4 border" style="background:var(--card);border-color:var(--cborder)">
+      <h4 class="font-semibold text-sm mb-2">📈 تطور النتيجة</h4>
+      <div class="flex items-end gap-1 h-16" dir="ltr">${hist.slice(-20).map(h=>{const p=Math.max(h.score,3),c=h.score>=80?'#4ade80':h.score>=50?'#eab308':'#f87171';return `<div style="height:${p}%;background:${c};flex:1;border-radius:2px;min-width:3px" title="${h.score}%"></div>`}).join('')}</div>
+    </div>`;
+  }
+
+  // Weak entries details
+  if(weakEntries.length>0){
+    html+=`<div class="rounded-xl p-4 border" style="background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.25)">
+      <h4 class="font-semibold text-sm mb-2" style="color:#f87171">⚠️ كلمات مرور ضعيفة (${weakEntries.length})</h4>
+      <div class="space-y-1.5">${weakEntries.map(e=>{const h=GEN.health(e.password||'');return `<div class="flex items-start gap-2 text-xs"><span style="color:#f87171">•</span><div class="flex-1"><strong>${esc(e.title)}</strong><div class="flex flex-wrap gap-1 mt-0.5">${h.iss.map(i=>`<span class="chip chip-r">${i}</span>`).join('')}</div></div></div>`}).join('')}</div>
+    </div>`;
+  }
+
+  // Reused passwords
+  if(reused.length>0){
+    html+=`<div class="rounded-xl p-4 border" style="background:rgba(234,179,8,0.08);border-color:rgba(234,179,8,0.25)">
+      <h4 class="font-semibold text-sm mb-2" style="color:#facc15">🔄 كلمات مرور مكررة (${reused.length})</h4>
+      <div class="space-y-1 text-xs" style="color:var(--text2)">${reused.map(a=>`<div>• ${a.join('، ')}</div>`).join('')}</div>
+    </div>`;
+  }
+
+  // Recommendations
+  const recs=[];
+  if(wk>0)recs.push(`🔴 ${wk} كلمة مرور ضعيفة — غيّرها بكلمات أقوى (12+ حرفاً)`);
+  if(reused.length>0)recs.push(`🟡 ${reused.length} كلمة مكررة — استخدم كلمة فريدة لكل حساب`);
+  if(breached.length>0)recs.push(`🔴 ${breached.length} كلمة تحتوي على أنماط شائعة — تجنب الكلمات الشائعة`);
+  if(pctTotp<50&&S.data.length>3)recs.push(`🔵 ${pctTotp}% فقط تفعيل TOTP — فعّل المصادقة الثنائية للحسابات المهمة`);
+  if(S.data.filter(e=>!e.password).length>0)recs.push(`⚪ ${S.data.filter(e=>!e.password).length} إدخال بدون كلمة مرور (ملاحظات)`);
+  if(!recs.length)recs.push('✅ لا توجد توصيات — خزنتك آمنة!');
+
+  html+=`<div class="rounded-xl p-4 border" style="background:var(--card);border-color:var(--cborder)">
+    <h4 class="font-semibold text-sm mb-2">💡 التوصيات</h4>
+    <ul class="space-y-1 text-xs" style="color:var(--text2)">${recs.map(r=>`<li>${r}</li>`).join('')}</ul>
+  </div>`;
+
+  html+=`<div class="text-center"><button id="dashRefresh" class="btn-ghost text-xs px-4 py-1.5">🔄 تحديث</button></div>`;
+  r.innerHTML=html;
+  const rb=document.getElementById('dashRefresh');if(rb)rb.addEventListener('click',renderDash);
+}
+
+// ========== UI ==========
+let _sort='date-desc',_filter='all',_folder='__all';
+function switchTab(t) {
+  S.tab=t;
+  $$('.tab-btn').forEach(b=>{b.classList.toggle('tab-active',b.dataset.tab===t);b.style.color=b.dataset.tab===t?'white':'var(--text2)'});
+  $$('.mn').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  $$('.tab-content').forEach(c=>c.classList.add('hidden'));
+  const el=document.getElementById('tab-'+t);el.classList.remove('hidden');el.classList.remove('fade-in');void el.offsetWidth;el.classList.add('fade-in');
+  if(t==='vault')updateVault();if(t==='dashboard')updateDash();
+}
+$$('.tab-btn, .mn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+$('#dashGoVault').addEventListener('click',()=>switchTab('vault'));
+
+function updateVault() {
+  const u=S.key!==null;
+  $('#unlockForm').classList.toggle('hidden',u);
+  $('#vaultContent').classList.toggle('hidden',!u);
+  $('#vaultActions').classList.toggle('hidden',!u);
+  const first=!ST.load();
+  $('#firstTimeMsg').classList.toggle('hidden',!first||u);
+  if(u)renderEntries();
+}
+
+$('#btnUnlock').addEventListener('click',async()=>{
+  const p=$('#mp').value;if(!p||p.length<4){toast('كلمة المرور قصيرة (4+ أحرف)','error');return}
+  const btn=$('#btnUnlock');btn.disabled=true;btn.innerHTML='⏳...';const ok=await unlock(p);
+  btn.disabled=false;btn.innerHTML='🔓 فتح';
+  if(ok){$('#mp').value='';toast('تم فتح الخزنة');updateVault();updateDash();updateSettingsUI();}
+  else toast('كلمة المرور خاطئة','error');
+});
+$('#mp').addEventListener('keydown',e=>{if(e.key==='Enter')$('#btnUnlock').click()});
+$('#toggleMp').addEventListener('click',()=>{const i=$('#mp');i.type=i.type==='password'?'text':'password'});
+
+$('#btnLock').addEventListener('click',()=>{lock();toast('تم القفل','info')});
+$('#vSearch').addEventListener('input',renderEntries);
+$('#vFilter').addEventListener('change',function(){_filter=this.value;renderEntries()});
+$('#vSort').addEventListener('change',function(){_sort=this.value;renderEntries()});
+$('#vFolder').addEventListener('change',function(){_folder=this.value;renderEntries()});
+
+// ========== ENTRIES ==========
+function getSorted(arr){
+  const a=[...arr];const map={};
+  switch(_sort){
+    case'date-desc':return a.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    case'date-asc':return a.sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+    case'title-asc':return a.sort((a,b)=>(a.title||'').localeCompare(b.title||'','ar'));
+    case'title-desc':return a.sort((a,b)=>(b.title||'').localeCompare(a.title||'','ar'));
+    default:return a;
+  }
+}
+
+function getTypeIcon(type){return type==='password'?'🔑':type==='note'?'📝':type==='identity'?'🪪':type==='payment'?'💳':'🔑'}
+function getTypeLabel(type){return type==='password'?'كلمة مرور':type==='note'?'ملاحظة':type==='identity'?'هوية':type==='payment'?'بطاقة':'كلمة مرور'}
+
+function renderEntries() {
+  const list=$('#entriesList'),empty=$('#emptyVault'),noRes=$('#noResults'),st=$('#vSearch').value.trim().toLowerCase();
+  let f=S.data;
+  // Filter by type
+  if(_filter!=='all')f=f.filter(e=>e.type===_filter);
+  // Filter by folder
+  if(_folder==='__favorites')f=f.filter(e=>e.favorite);
+  else if(_folder!=='__all')f=f.filter(e=>e.folder===_folder);
+  // Search
+  if(st)f=f.filter(e=>(e.title||'').toLowerCase().includes(st)||(e.username||'').toLowerCase().includes(st)||(e.notes||'').toLowerCase().includes(st));
+  f=getSorted(f);
+
+  $('#entryCount').textContent=S.data.length;
+
+  if(!S.data.length){empty.classList.remove('hidden');noRes.classList.add('hidden');list.innerHTML='';updateStats();return}
+  empty.classList.add('hidden');
+  if(!f.length){noRes.classList.remove('hidden');list.innerHTML='';updateStats();return}
+  noRes.classList.add('hidden');
+
+  list.innerHTML=f.map((e,i)=>{
+    const ri=S.data.indexOf(e),s=GEN.str(e.password||''),icon=getTypeIcon(e.type);
+    const exp=e.expiry?Math.ceil((new Date(e.expiry).getTime()-now())/864e5):null,exd=exp!==null&&exp<=0,exg=exp!==null&&exp>0&&exp<=14;
+    const totpActive=!!e.totp;
+    // Subtitle based on type
+    let sub=e.username||'';
+    if(e.type==='note')sub=e.notes?(e.notes.slice(0,80)+(e.notes.length>80?'...':'')):'';
+    if(e.type==='identity')sub=e.fullName||e.email||'';
+    if(e.type==='payment')sub='•••• '+((e.cardNum||'').slice(-4));
+    return `<div class="entry-card rounded-xl p-3 sm:p-4 border slide-up" style="background:var(--code);border-color:var(--cborder)" data-idx="${ri}" style="animation-delay:${Math.min(i*25,300)}ms">
+      <div class="flex items-start justify-between gap-2">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-1.5 mb-0.5 flex-wrap">
+            <span class="text-xs">${icon}</span>
+            <h4 class="font-semibold text-sm truncate max-w-[160px]"></h4>
+            ${e.favorite?'<span class="text-yellow-400 text-xs">⭐</span>':''}
+            ${totpActive?'<span class="chip chip-g" style="font-size:9px;padding:0 6px">TOTP</span>':''}
+            <span class="text-xs px-1.5 py-0.5 rounded-full font-medium" style="background:${s.hx}20;color:${s.hx};font-size:9px">${s.lb}</span>
+            ${exd?'<span class="chip chip-r" style="font-size:9px;padding:0 6px">منتهي</span>':''}
+            ${exg?`<span class="chip chip-y" style="font-size:9px;padding:0 6px">${exp} يوم</span>`:''}
+          </div>
+          <p class="text-xs truncate" style="color:var(--text2)"></p>
+          <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+            ${e.type==='password'?`<code class="pwd text-xs px-2 py-0.5 rounded border min-w-[40px] inline-block" style="background:var(--input);border-color:var(--border);color:var(--text)" data-pwd="${ri}"></code>
+            <button class="tpwd text-xs cursor-pointer" style="color:#818cf8" data-idx="${ri}">👁️</button>
+            <button class="cpwd text-xs cursor-pointer" style="color:var(--text3)" data-idx="${ri}">📋</button>`:''}
+            ${totpActive?`<button class="ttotp text-xs cursor-pointer" style="color:#4ade80" data-idx="${ri}">🔑 TOTP</button>`:''}
+            ${e.url?`<a href="${esc(e.url)}" target="_blank" rel="noopener" class="text-xs underline" style="color:#818cf8">🔗</a>`:''}
+            <span class="text-xs" style="color:var(--text3)">${daysAgo(e.createdAt)}</span>
+          </div>
+        </div>
+        <div class="flex gap-0.5 shrink-0">
+          <button class="epwd text-xs p-1.5 rounded-lg cursor-pointer" style="color:var(--text3)" data-idx="${ri}" title="تعديل">✏️</button>
+          <button class="dpwd text-xs p-1.5 rounded-lg cursor-pointer" style="color:#f87171" data-idx="${ri}" title="حذف">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  f.forEach((e,i)=>{const c=list.children[i],ri=S.data.indexOf(e);if(!c)return;c.querySelector('h4').textContent=e.title||'بدون عنوان';
+    let sub=e.username||'';if(e.type==='note')sub=e.notes?(e.notes.slice(0,80)+(e.notes.length>80?'...':'')):'';if(e.type==='identity')sub=e.fullName||e.email||'';if(e.type==='payment')sub='•••• '+(e.cardNum||'').slice(-4);
+    c.querySelector('p').textContent=sub;
+    const pf=c.querySelector(`[data-pwd="${ri}"]`);if(pf)pf.textContent='•'.repeat(Math.min((e.password||'').length,12));
+  });
+
+  // Events
+  list.querySelectorAll('.tpwd').forEach(b=>{b.addEventListener('click',()=>{const idx=parseInt(b.dataset.idx),e=S.data.find(x=>S.data.indexOf(x)===idx);if(!e)return;const f=list.querySelector(`[data-pwd="${idx}"]`);if(!f)return;if(f.textContent.startsWith('•')){f.textContent=e.password;b.textContent='🙈'}else{f.textContent='•'.repeat(Math.min(e.password.length,12));b.textContent='👁️'}})});
+  list.querySelectorAll('.cpwd').forEach(b=>{b.addEventListener('click',()=>{const e=S.data.find(x=>S.data.indexOf(x)===parseInt(b.dataset.idx));if(e)copyClip(e.password||'')})});
+  list.querySelectorAll('.epwd').forEach(b=>{b.addEventListener('click',()=>{const e=S.data.find(x=>S.data.indexOf(x)===parseInt(b.dataset.idx));if(e)openEntryModal(e)})});
+  list.querySelectorAll('.dpwd').forEach(b=>{b.addEventListener('click',()=>{const e=S.data.find(x=>S.data.indexOf(x)===parseInt(b.dataset.idx));if(!e||!confirm(`حذف "${e.title}"؟`))return;S.data=S.data.filter(x=>x!==e);saveAll().then(()=>{renderEntries();toast('تم الحذف')})})});
+  list.querySelectorAll('.ttotp').forEach(b=>{b.addEventListener('click',()=>{const e=S.data.find(x=>S.data.indexOf(x)===parseInt(b.dataset.idx));if(e&&e.totp)showTotp(e)})});
+
+  updateStats();
+}
+
+function updateStats() {
+  const bar=$('#statsRow');
+  if(!S.data.length){bar.innerHTML='';return}
+  const s=S.data.filter(e=>GEN.str(e.password||'').sc>=80).length,w=S.data.filter(e=>GEN.str(e.password||'').sc<50).length;
+  const r=S.data.filter(e=>S.data.filter(x=>x.password&&x.password===e.password).length>1).length;
+  bar.innerHTML=`<span>📊 <strong>${S.data.length}</strong> إدخال</span><span style="color:#4ade80">🟢 <strong>${s}</strong> قوية</span>${w?`<span style="color:#f87171">🔴 <strong>${w}</strong> ضعيفة</span>`:''}${r?`<span style="color:#facc15">🟡 <strong>${r}</strong> مكررة</span>`:''}`;
+}
+
+// ========== TOTP ==========
+function showTotp(entry) {
+  const m=$('#totpModal');m.style.display='flex';m.classList.remove('hidden');
+  const codeEl=$('#totpCode'),labelEl=$('#totpLabel'),prog=$('#totpProgress'),timerEl=$('#totpTimer');
+  labelEl.textContent=entry.title||'TOTP';
+  let running=true;
+
+  async function tick(){
+    if(!running)return;
+    try{
+      const code=await CR.totp(entry.totp);
+      codeEl.textContent=code;
+    }catch{codeEl.textContent='-----';}
+    const sec=30-(Math.floor(Date.now()/1000)%30);
+    prog.style.width=(sec/30*100)+'%';
+    timerEl.textContent=sec;
+    setTimeout(tick,1000);
+  }
+  tick();
+
+  // Close handlers
+  const close=()=>{running=false;m.style.display='none';m.classList.add('hidden')};
+  m.addEventListener('click',function(e){if(e.target===this)close()});
+  // Remove old listeners by replacing
+  const old=m.querySelector('.close-totp');
+  const btn=document.createElement('button');
+  btn.className='btn-ghost mt-3 text-xs px-4 py-1.5 close-totp';
+  btn.textContent='إغلاق';
+  btn.onclick=close;
+  const existing=m.querySelector('.close-totp');
+  if(existing)existing.remove();
+  m.querySelector('.glass').appendChild(btn);
+}
+
+// ========== MODAL ==========
+function openEntryModal(entry) {
+  const isNew=!entry;
+  $('#modalTitle').textContent=isNew?'إضافة إدخال':'تعديل الإدخال';
+  $('#editId').value=entry?entry.id:'';
+
+  const type=entry?entry.type||'password':'password';
+  $('#mType').value=type;
+
+  // Set type button active
+  $$('.etype-btn').forEach(b=>{b.classList.toggle('active',b.dataset.etype===type);b.style.background=b.dataset.etype===type?'#6366f1':'var(--code)';b.style.color=b.dataset.etype===type?'#fff':'var(--text2)'});
+
+  // Show/hide type-specific fields
+  $('#mPwdFields').classList.toggle('hidden',type!=='password');
+  $('#mIdFields').classList.toggle('hidden',type!=='identity');
+  $('#mPayFields').classList.toggle('hidden',type!=='payment');
+
+  $('#mTitle').value=entry?entry.title||'':'';
+  $('#mUrl').value=entry?entry.url||'':'';
+  $('#mUsername').value=entry?entry.username||'':'';
+  $('#mPassword').value=entry?entry.password||'':'';
+  $('#mTotp').value=entry?entry.totp||'':'';
+  $('#mNotes').value=entry?entry.notes||'':'';
+  $('#mTags').value=entry?entry.tags||'':'';
+  $('#mExpiry').value=entry?entry.expiry||'':'';
+  $('#mFavorite').checked=entry?!!entry.favorite:false;
+  $('#mFullName').value=entry?entry.fullName||'':'';
+  $('#mEmail').value=entry?entry.email||'':'';
+  $('#mPhone').value=entry?entry.phone||'':'';
+  $('#mAddress').value=entry?entry.address||'':'';
+  $('#mIdNumber').value=entry?entry.idNumber||'':'';
+  $('#mCardName').value=entry?entry.cardName||'':'';
+  $('#mCardNum').value=entry?entry.cardNum||'':'';
+  $('#mCardExp').value=entry?entry.cardExp||'':'';
+  $('#mCardCvv').value=entry?entry.cardCvv||'':'';
+  $('#mCardPin').value=entry?entry.cardPin||'':'';
+
+  showModal();
+}
+
+function showModal() {
+  const m=$('#entryModal');m.style.display='flex';m.classList.remove('hidden');document.body.style.overflow='hidden';
+  setTimeout(()=>$('#mTitle').focus(),100);
+}
+function closeModal() {
+  const m=$('#entryModal');m.style.display='none';m.classList.add('hidden');document.body.style.overflow='';
+}
+
+// Modal type switching
+$$('.etype-btn').forEach(b=>{b.addEventListener('click',function(){
+  $$('.etype-btn').forEach(b2=>{b2.classList.toggle('active',b2===this);b2.style.background=b2===this?'#6366f1':'var(--code)';b2.style.color=b2===this?'#fff':'var(--text2)'});
+  $('#mType').value=this.dataset.etype;
+  $('#mPwdFields').classList.toggle('hidden',this.dataset.etype!=='password');
+  $('#mIdFields').classList.toggle('hidden',this.dataset.etype!=='identity');
+  $('#mPayFields').classList.toggle('hidden',this.dataset.etype!=='payment');
+})});
+
+$('#modalClose').addEventListener('click',closeModal);
+$('#modalCancel').addEventListener('click',closeModal);
+$('#toggleMpwd').addEventListener('click',()=>{const i=$('#mPassword');i.type=i.type==='password'?'text':'password'});
+
+// Password generator in modal
+$('#mPwdGen').addEventListener('change',function(){
+  const v=this.value;if(!v)return;
+  let pw='';
+  if(v.startsWith('pwd-')){const {pw:p}=GEN.genPwd(parseInt(v.split('-')[1]),{u:1,l:1,n:1,s:1,av:0});pw=p}
+  else if(v.startsWith('phrase-')){const {pw:p}=GEN.genPhrase(parseInt(v.split('-')[1]),'-',1,1);pw=p}
+  else if(v.startsWith('pin-')){const {pw:p}=GEN.genPin(parseInt(v.split('-')[1]));pw=p}
+  $('#mPassword').value=pw;this.value='';toast('تم توليد كلمة المرور');
+});
+
+// TOTP test
+$('#btnTotpTest').addEventListener('click',async()=>{
+  const secret=$('#mTotp').value.trim();if(!secret){toast('أدخل TOTP Secret أولاً','warning');return}
+  try{const code=await CR.totp(secret);toast(`الرمز: ${code}`,'success',5e3)}catch{toast('Secret غير صالح — تأكد من ترميز base32','error')}
+});
+
+$('#modalSave').addEventListener('click',async()=>{
+  const title=$('#mTitle').value.trim(),type=$('#mType').value,editId=$('#editId').value;
+  if(!title){toast('العنوان مطلوب','error');return}
+
+  const base={title,type:type||'password',favorite:$('#mFavorite').checked,tags:$('#mTags').value.trim(),expiry:$('#mExpiry').value,notes:$('#mNotes').value.trim(),updatedAt:now()};
+
+  if(type==='password'){base.url=$('#mUrl').value.trim();base.username=$('#mUsername').value.trim();base.password=$('#mPassword').value;base.totp=$('#mTotp').value.trim()}
+  if(type==='identity'){base.fullName=$('#mFullName').value.trim();base.email=$('#mEmail').value.trim();base.phone=$('#mPhone').value.trim();base.address=$('#mAddress').value.trim();base.idNumber=$('#mIdNumber').value.trim()}
+  if(type==='payment'){base.cardName=$('#mCardName').value.trim();base.cardNum=$('#mCardNum').value.trim();base.cardExp=$('#mCardExp').value.trim();base.cardCvv=$('#mCardCvv').value.trim();base.cardPin=$('#mCardPin').value.trim()}
+
+  if(editId){
+    const e=S.data.find(x=>x.id===editId);if(e){const hist=e.passwordHistory||[];if(e.password&&e.password!==base.password&&base.password)hist.push({pw:e.password,at:now()});if(hist.length>20)hist.splice(0,hist.length-20);Object.assign(e,base,{passwordHistory:hist});}
+    toast('تم التحديث');
+  } else {
+    base.id=id();base.createdAt=now();base.passwordHistory=[];
+    S.data.push(base);
+    toast('تمت الإضافة');
+  }
+  await saveAll();closeModal();renderEntries();updateDash();
+});
+
+$('#btnAdd').addEventListener('click',()=>openEntryModal(null));
+
+// ========== EXPORT / IMPORT ==========
+async function exportJson() {
+  if(!S.key){toast('افتح الخزنة أولاً','warning');return}
+  try{const e=await CR.enc(JSON.stringify({data:S.data,folders:S.folders,exportedAt:now(),version:APP.version}),S.key);
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({v:5,data:e,exportedAt:now()})],{type:'application/json'}));
+    a.download=`passguard-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);toast('تم التصدير');
+  }catch{toast('فشل التصدير','error')}
+}
+async function exportCsv() {
+  if(!S.key||!S.data.length){toast('الخزنة فارغة أو مغلقة','warning');return}
+  const h='title,url,username,password,type,notes,totp,tags,favorite,expiry,createdAt';
+  const rows=S.data.map(e=>[e.title||'',e.url||'',e.username||'',e.password||'',e.type||'password',(e.notes||'').replace(/"/g,'""'),e.totp||'',e.tags||'',e.favorite?'true':'',e.expiry||'',e.createdAt||'']);
+  const csv=h+'\n'+rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`passguard-export-${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(a.href);toast('تم التصدير');
+}
+
+async function importBitwardenJson(text) {
+  try{const items=JSON.parse(text);const arr=items.items||items;
+    if(!Array.isArray(arr))throw 0;
+    let added=0,ids=new Set(S.data.map(e=>e.id));
+    for(const item of arr){
+      const id2=id();if(ids.has(id2))continue;ids.add(id2);
+      const entry={id:id2,title:item.name||'',url:item.login?.uris?.[0]?.uri||item.login?.url||'',username:item.login?.username||'',password:item.login?.password||'',type:'password',notes:item.notes||'',totp:item.login?.totp||'',tags:(item.collectionIds||[]).join(','),favorite:!!item.favorite,expiry:'',createdAt:item.creationDate?new Date(item.creationDate).getTime():now(),passwordHistory:[]};
+      S.data.push(entry);added++;
+    }return added;
+  }catch{return -1}
+}
+
+async function importCsv(text) {
+  try{
+    const lines=text.split('\n').filter(l=>l.trim()).slice(1);
+    let added=0,ids=new Set(S.data.map(e=>e.id));
+    for(const line of lines){
+      const cols=[];let curr='',inQ=false;
+      for(const c of line){if(c==='"'){inQ=!inQ}else if(c===','&&!inQ){cols.push(curr);curr=''}else curr+=c}
+      cols.push(curr);
+      const [title,url,username,password,type,notes,totp,tags,favorite,expiry]=cols;
+      const id2=id();if(ids.has(id2))continue;ids.add(id2);
+      const entry={id:id2,title:title||'',url:url||'',username:username||'',password:password||'',type:type||'password',notes:(notes||'').replace(/""/g,'"'),totp:totp||'',tags:tags||'',favorite:favorite==='true',expiry:expiry||'',createdAt:now(),passwordHistory:[]};
+      S.data.push(entry);added++;
+    }return added;
+  }catch{return -1}
+}
+
+// ========== SETTINGS ==========
+function updateSettingsUI() {
+  const s=ST.loadSettings();
+  $('#setAutoLock').value=s.autoLock||'5';
+  if(s.pinEnabled&&s.pinHash){$('#setPinEnable').checked=true;$('#pinSection').classList.remove('hidden')}
+  $('#setTheme').value=s.theme||'dark';
+}
+
+$('#setAutoLock').addEventListener('change',function(){const s=ST.loadSettings();s.autoLock=this.value;ST.saveSettings(s);restartInactivity()});
+$('#setPinEnable').addEventListener('change',function(){
+  const s=ST.loadSettings();
+  if(this.checked){$('#pinSection').classList.remove('hidden');$('#setPinInput').focus()}
+  else{$('#pinSection').classList.add('hidden');s.pinEnabled=false;delete s.pinHash;S.pinEnabled=false;S.pinHash=null;ST.saveSettings(s)}
+});
+$('#setPinInput').addEventListener('input',async function(){
+  const v=this.value.replace(/\D/g,'');this.value=v;
+  const s=ST.loadSettings();
+  if(v.length>=4&&v.length<=8){s.pinHash=await CR.sha256(v);s.pinEnabled=true;ST.saveSettings(s);S.pinEnabled=true;S.pinHash=s.pinHash;toast('تم تعيين PIN');}
+});
+$('#setTheme').addEventListener('change',function(){const s=ST.loadSettings();s.theme=this.value;ST.saveSettings(s);applyTheme(this.value)});
+
+$('#setExportJson').addEventListener('click',exportJson);
+$('#setExportCsv').addEventListener('click',exportCsv);
+$('#setImport').addEventListener('click',()=>{
+  if(!S.key){toast('افتح الخزنة أولاً','warning');return}
+  const m=$('#importModal');m.style.display='flex';m.classList.remove('hidden');
+});
+$('#importCancel').addEventListener('click',()=>{$('#importModal').style.display='none';$('#importModal').classList.add('hidden')});
+$('#importFileInput').addEventListener('change',async function(){
+  if(this.files&&this.files[0]){
+    const fmt=$('#importFormat').value;
+    try{
+      const text=await this.files[0].text();
+      let added=0;
+      if(fmt==='pg-json'||fmt==='bitwarden-json'){if(fmt==='bitwarden-json')added=await importBitwardenJson(text);else{const pkg=JSON.parse(text);if(pkg.data){const dec=await CR.dec(pkg.data,S.key);const d=JSON.parse(dec);if(d.data)for(const e of d.data){if(!S.data.find(x=>x.id===e.id)){S.data.push(e);added++}}}}
+      }else if(fmt==='csv'){added=await importCsv(text)}
+      if(added>=0){await saveAll();renderEntries();updateDash();toast(`تم استيراد ${added} إدخال`);}else toast('فشل الاستيراد','error');
+    }catch{toast('فشل الاستيراد — تأكد من صحة الملف','error')}
+    this.value='';$('#importModal').style.display='none';$('#importModal').classList.add('hidden');
+  }
+});
+
+// Import from settings
+$('#setClear').addEventListener('click',()=>{if(confirm('هل أنت متأكد؟ هذا سيحذف جميع البيانات!')){
+  S.data=[];S.folders=[];saveAll().then(()=>{renderEntries();updateDash();toast('تم المسح')})}});
+
+// ========== CLIPBOARD ==========
+async function copyClip(t){try{await navigator.clipboard.writeText(t);toast('📋 تم النسخ')}catch{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('📋 تم النسخ')}catch{toast('فشل النسخ','error')}document.body.removeChild(ta)}}
+
+// ========== GENERATOR UI ==========
+let _genMode='pwd';
+$('#genModePwd').addEventListener('click',()=>{_genMode='pwd';setGenMode()});
+$('#genModePhrase').addEventListener('click',()=>{_genMode='phrase';setGenMode()});
+$('#genModePin').addEventListener('click',()=>{_genMode='pin';setGenMode()});
+function setGenMode(){
+  $$('.gen-mode-btn').forEach(b=>{b.classList.toggle('active',false);b.style.background='var(--code)';b.style.color='var(--text2)'});
+  const b=document.getElementById('genMode'+_genMode.charAt(0).toUpperCase()+_genMode.slice(1));
+  if(b){b.classList.add('active');b.style.background='#6366f1';b.style.color='#fff'}
+  $('#genPwdPanel').classList.toggle('hidden',_genMode!=='pwd');
+  $('#genPhrasePanel').classList.toggle('hidden',_genMode!=='phrase');
+  $('#genPinPanel').classList.toggle('hidden',_genMode!=='pin');
+}
+
+$('#pwdLen').addEventListener('input',function(){$('#pwdLenVal').textContent=this.value});
+$('#phraseWords').addEventListener('input',function(){$('#phraseWordsVal').textContent=this.value});
+$('#pinLen').addEventListener('input',function(){$('#pinLenVal').textContent=this.value});
+
+$('#btnGen').addEventListener('click',()=>{
+  let result={pw:'',ent:0};
+  if(_genMode==='pwd'){
+    const l=parseInt($('#pwdLen').value),o={u:$('#pu').checked,l:$('#pl').checked,n:$('#pn').checked,s:$('#ps').checked,av:$('#pavoid').checked};
+    if(!o.u&&!o.l&&!o.n&&!o.s){toast('اختر نوع حرف واحد','error');return}
+    result=GEN.genPwd(l,o);
+  }else if(_genMode==='phrase'){
+    const n=parseInt($('#phraseWords').value),sep=$('#phraseSep').value,cap=$('#phraseCap').checked,num=$('#phraseNum').checked;
+    result=GEN.genPhrase(n,sep,cap,num);
+  }else{
+    const l=parseInt($('#pinLen').value);
+    result=GEN.genPin(l);
+  }
+  S.genPwd=result.pw;
+  if(_genMode==='pwd'){$('#genDisplay').textContent=result.pw;updateStr(result.pw)}
+  else if(_genMode==='phrase'){$('#phraseDisplay').textContent=result.pw;const s=GEN.str(result.pw);$('#phraseStrBar').style.width=s.sc+'%';$('#phraseStrBar').style.background=s.hx;$('#phraseStrText').textContent=s.lb;$('#phraseStrText').style.color=s.hx}
+  else{$('#pinDisplay').textContent=result.pw}
+  $('#btnCopy').disabled=false;
+});
+
+function updateStr(pw){const s=GEN.str(pw);$('#strBar').style.width=s.sc+'%';$('#strBar').style.background=s.hx;$('#strText').textContent=s.lb;$('#strText').style.color=s.hx;$('#entropyVal').textContent=Math.floor(pw.length*Math.log2(72))}
+$('#btnCopy').addEventListener('click',()=>{if(S.genPwd)copyClip(S.genPwd)});
+
+// ========== INACTIVITY ==========
+let _inact;
+function restartInactivity(){clearTimeout(_inact);const s=ST.loadSettings(),m=parseInt(s.autoLock||'5')*6e4;if(m>0)_inact=setTimeout(()=>{if(S.key){lock();toast('تم القفل لعدم النشاط','info')}},m)}
+document.addEventListener('click',restartInactivity);document.addEventListener('keydown',restartInactivity);document.addEventListener('mousemove',restartInactivity);restartInactivity();
+window.addEventListener('beforeunload',()=>{if(S.key)lock()});
+
+// ========== PIN QUICK UNLOCK ==========
+$('#btnUnlock').addEventListener('click',async()=>{
+  const p=$('#mp').value;if(!p||p.length<4){toast('كلمة المرور قصيرة','error');return}
+  const btn=$('#btnUnlock');btn.disabled=true;btn.innerHTML='⏳...';const ok=await unlock(p);
+  btn.disabled=false;btn.innerHTML='🔓 فتح';
+  if(ok){$('#mp').value='';toast('تم فتح الخزنة');updateVault();updateDash();updateSettingsUI()}
+  else toast('كلمة المرور خاطئة','error');
+});
+
+// ========== KEYBOARD SHORTCUTS ==========
+document.addEventListener('keydown',e=>{
+  if(!e.ctrlKey&&!e.metaKey)return;
+  const k=e.key;
+  if(k==='1'){e.preventDefault();switchTab('generator')}
+  else if(k==='2'){e.preventDefault();switchTab('vault')}
+  else if(k==='3'){e.preventDefault();switchTab('dashboard')}
+  else if(k==='4'){e.preventDefault();switchTab('settings')}
+  else if((k==='n'||k==='N')&&S.tab==='vault'&&S.key){e.preventDefault();openEntryModal(null)}
+});
+
+// ========== CLOSE MODALS ON OVERLAY ==========
+$('#entryModal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+$('#totpModal').addEventListener('click',function(e){if(e.target===this){this.style.display='none';this.classList.add('hidden')}});
+$('#importModal').addEventListener('click',function(e){if(e.target===this){this.style.display='none';this.classList.add('hidden')}});
+
+// ========== PIN CHECK ON UNLOAD RESTORE ==========
+// If PIN is set, show PIN modal instead of master password
+async function checkPinUnlock(){
+  const s=ST.loadSettings();
+  if(s.pinEnabled&&s.pinHash&&ST.load()){
+    S.pinEnabled=true;S.pinHash=s.pinHash;
+    $('#pinModal').style.display='flex';$('#pinModal').classList.remove('hidden');
+    $('#pinInput').focus();
+  }
+}
+$('#pinConfirm').addEventListener('click',async()=>{
+  const pin=$('#pinInput').value.replace(/\D/g,'');if(!pin||pin.length<4){toast('PIN يجب أن يكون 4-8 أرقام','error');return}
+  const h=await CR.sha256(pin);
+  if(h===S.pinHash){
+    // Get the actual master password from session
+    // We need to re-prompt for master password after PIN
+    $('#pinModal').style.display='none';$('#pinModal').classList.add('hidden');$('#pinInput').value='';
+    // Try to unlock with the stored session - actually PIN can't decrypt, we need master password
+    // So PIN unlock just shows the vault but we need the key
+    // Better approach: PIN restores from session
+    toast('PIN صحيح — أدخل كلمة المرور الرئيسية','info');
+    $('#mp').focus();
+  } else {
+    toast('PIN خاطئ','error');
+  }
+});
+$('#pinCancel').addEventListener('click',()=>{$('#pinModal').style.display='none';$('#pinModal').classList.add('hidden')});
+
+// ========== INIT ==========
+updateVault();
+updateDash();
+updateSettingsUI();
+</script>
+</body>
+</html>

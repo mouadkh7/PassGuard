@@ -1126,6 +1126,9 @@ $('#pinConfirm').addEventListener('click',async()=>{
 });
 $('#pinCancel').addEventListener('click',()=>{$('#pinModal').style.display='none';$('#pinModal').classList.add('hidden')});
 
+// ========== PWA ==========
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+
 // ========== INIT ==========
 updateVault();
 updateDash();
